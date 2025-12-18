@@ -11,6 +11,15 @@ Run these from the repo root unless noted otherwise:
 - `pnpm --filter api start` — runs the compiled API from `dist/`
 - `pnpm --filter api test` — runs the API tests
 
+## Environment Variables
+
+Create an `apps/api/.env` file (or set env vars in your process manager). Use `apps/api/.env.example` as a starting point.
+
+- `NODE_ENV`: `development` | `test` | `production` (default: `development`)
+- `HOST`: bind address (default: `0.0.0.0`)
+- `PORT`: server port (default: `3001`)
+- `CORS_ORIGIN`: optional. If set, CORS is restricted to that origin; otherwise CORS allows all origins.
+
 ## Learn More
 
 To learn Fastify, check out the [Fastify documentation](https://fastify.dev/docs/latest/).

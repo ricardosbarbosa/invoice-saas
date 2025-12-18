@@ -29,3 +29,12 @@ To use the components in your app, import them from the `ui` package.
 ```tsx
 import { Button } from "@workspace/ui/components/button"
 ```
+
+## Environment Variables (T3 Env)
+
+This repo uses **T3 Env** for typed + runtime-validated environment variables.
+
+- Web (Next.js): copy `apps/web/.env.example` to `apps/web/.env.local`
+- API (Fastify): copy `apps/api/.env.example` to `apps/api/.env`
+
+If required env vars are missing/invalid, the app will fail fast at startup/build time.

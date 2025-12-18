@@ -26,9 +26,13 @@
     "@fastify/autoload": "^6.0.0",
     "@fastify/cors": "^11.2.0",
     "@fastify/sensible": "^6.0.0",
+    "@t3-oss/env-core": "^0.13.0",
+    "@workspace/env": "workspace:*",
+    "dotenv": "^16.4.7",
     "fastify": "^5.0.0",
     "fastify-cli": "^7.4.1",
-    "fastify-plugin": "^5.0.0"
+    "fastify-plugin": "^5.0.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.19.25",

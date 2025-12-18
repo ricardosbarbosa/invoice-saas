@@ -1,6 +1,9 @@
+import 'dotenv/config'
+
 import { join } from 'node:path'
 import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload'
 import { FastifyPluginAsync, FastifyServerOptions } from 'fastify'
+import { env } from './env'
 
 export interface AppOptions extends FastifyServerOptions, Partial<AutoloadPluginOptions> {
 
@@ -14,13 +17,14 @@ const app: FastifyPluginAsync<AppOptions> = async (
   opts
 ): Promise<void> => {
   // Place here your custom code!
+  // Validate environment variables as early as possible.
+  void env
 
   // Do not touch the following lines
 
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
   // through your application
-  // eslint-disable-next-line no-void
   void fastify.register(AutoLoad, {
     dir: join(__dirname, 'plugins'),
     options: opts
@@ -28,7 +32,6 @@ const app: FastifyPluginAsync<AppOptions> = async (
 
   // This loads all plugins defined in routes
   // define your routes in one of these
-  // eslint-disable-next-line no-void
   void fastify.register(AutoLoad, {
     dir: join(__dirname, 'routes'),
     options: opts
