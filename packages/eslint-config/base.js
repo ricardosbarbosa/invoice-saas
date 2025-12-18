@@ -29,4 +29,7 @@ export const config = [
   {
     ignores: ["dist/**"],
   },
+  {
+    ignores: [".next/**", "node_modules/**"],
+  },
 ]

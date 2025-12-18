@@ -1,35 +1,43 @@
 {
   "name": "api",
   "version": "1.0.0",
+  "private": true,
   "description": "This project was bootstrapped with Fastify-CLI.",
-  "main": "app.ts",
+  "type": "commonjs",
+  "main": "dist/app.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "npm run build:ts && tsc -p test/tsconfig.json && c8 node --test -r ts-node/register \"test/**/*.ts\"",
-    "start": "npm run build:ts && fastify start -l info dist/app.js",
-    "build:ts": "tsc",
-    "watch:ts": "tsc -w",
-    "dev": "npm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"npm:watch:ts\" \"npm:dev:start\"",
-    "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js"
+    "build": "tsc -p tsconfig.json",
+    "check-types": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p test/tsconfig.json",
+    "dev": "pnpm run build && concurrently -k -p \"[{name}]\" -n \"types,api\" -c \"yellow.bold,cyan.bold\" \"pnpm run dev:types\" \"pnpm run dev:start\"",
+    "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
+    "dev:types": "tsc -w --preserveWatchOutput -p tsconfig.json",
+    "lint": "eslint .",
+    "prestart": "pnpm run build",
+    "start": "fastify start -l info dist/app.js",
+    "test": "pnpm run build && tsc -p test/tsconfig.json && c8 node --test -r ts-node/register \"test/**/*.ts\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fastify": "^5.0.0",
-    "fastify-plugin": "^5.0.0",
     "@fastify/autoload": "^6.0.0",
     "@fastify/sensible": "^6.0.0",
-    "fastify-cli": "^7.4.1"
+    "fastify": "^5.0.0",
+    "fastify-cli": "^7.4.1",
+    "fastify-plugin": "^5.0.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.8",
+    "@types/node": "^20.19.25",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
     "c8": "^10.1.2",
-    "ts-node": "^10.4.0",
     "concurrently": "^9.0.0",
-    "fastify-tsconfig": "^3.0.0",
-    "typescript": "~5.9.2"
+    "eslint": "^9.39.1",
+    "globals": "^15.15.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

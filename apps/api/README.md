@@ -3,20 +3,13 @@ This project was bootstrapped with Fastify-CLI.
 
 ## Available Scripts
 
-In the project directory, you can run:
+Run these from the repo root unless noted otherwise:
 
-### `npm run dev`
-
-To start the app in dev mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-### `npm start`
-
-For production mode
-
-### `npm run test`
-
-Run the test cases.
+- `pnpm dev` — starts the monorepo dev servers (web + api) via Turbo
+- `pnpm --filter api dev` — starts only the API in watch mode
+- `pnpm --filter api build` — builds the API to `dist/`
+- `pnpm --filter api start` — runs the compiled API from `dist/`
+- `pnpm --filter api test` — runs the API tests
 
 ## Learn More
 
