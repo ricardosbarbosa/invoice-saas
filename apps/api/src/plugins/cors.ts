@@ -4,6 +4,7 @@ import { env } from '../env'
 
 export default fp<FastifyCorsOptions>(async (fastify) => {
   await fastify.register(cors, {
-    origin: env.CORS_ORIGIN ?? true
+    origin: env.CORS_ORIGIN ?? true,
+    credentials: true
   })
 })

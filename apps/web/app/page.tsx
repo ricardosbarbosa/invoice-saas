@@ -1,12 +1,9 @@
-import { Button } from "@workspace/ui/components/button"
+import { AuthPanel } from "./auth-panel"
 
 export default function Page() {
   return (
-    <div className="flex items-center justify-center min-h-svh">
-      <div className="flex flex-col items-center justify-center gap-4">
-        <h1 className="text-2xl font-bold">Hello World</h1>
-        <Button size="sm">Button</Button>
-      </div>
+    <div className="flex min-h-svh items-center justify-center bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6">
+      <AuthPanel />
     </div>
   )
 }

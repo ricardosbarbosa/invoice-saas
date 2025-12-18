@@ -3,6 +3,11 @@ import * as path from 'node:path'
 import * as test from 'node:test'
 const helper = require('fastify-cli/helper.js')
 
+process.env.DATABASE_URL ??= 'postgres://postgres:postgres@localhost:5432/postgres'
+process.env.BETTER_AUTH_SECRET ??= 'test-test-test-test-test-test-1234'
+process.env.BETTER_AUTH_URL ??= 'http://localhost:3001'
+process.env.CORS_ORIGIN ??= 'http://example.com'
+
 export type TestContext = {
   after: typeof test.after
 }

@@ -9,6 +9,7 @@
     "test": "test"
   },
   "scripts": {
+    "prebuild": "pnpm --filter @workspace/auth build",
     "build": "tsc -p tsconfig.json",
     "check-types": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p test/tsconfig.json",
     "dev": "pnpm run build && concurrently -k -p \"[{name}]\" -n \"types,api\" -c \"yellow.bold,cyan.bold\" \"pnpm run dev:types\" \"pnpm run dev:start\"",
@@ -27,6 +28,7 @@
     "@fastify/cors": "^11.2.0",
     "@fastify/sensible": "^6.0.0",
     "@t3-oss/env-core": "^0.13.0",
+    "@workspace/auth": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/env": "workspace:*",
     "dotenv": "^16.4.7",
