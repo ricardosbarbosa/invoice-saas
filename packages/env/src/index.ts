@@ -11,5 +11,5 @@ export { z }
 
 export const portSchema = z.coerce.number().int().min(1).max(65535)
 export const urlSchema = z.string().url()
-
+export const databaseUrlSchema = z.string().min(1)
 
