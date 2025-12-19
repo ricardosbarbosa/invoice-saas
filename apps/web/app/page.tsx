@@ -7,6 +7,8 @@ export default async function DashboardPage() {
 
   if (!session) {
     redirect("/login")
+  } else {
+    redirect("/dashboard")
   }
 
   return (
@@ -25,15 +27,15 @@ export default async function DashboardPage() {
 
         <section className="rounded-xl border bg-white/70 p-6 shadow-sm backdrop-blur">
           <h2 className="text-lg font-semibold text-neutral-900">Session</h2>
-          <p className="text-sm text-neutral-600">Welcome back, {session.user?.email ?? "user"}.</p>
+          <p className="text-sm text-neutral-600">Welcome back, {session?.user?.email ?? "user"}.</p>
           <dl className="mt-4 grid grid-cols-1 gap-4 text-sm text-neutral-700 sm:grid-cols-2">
             <div className="rounded-lg border border-neutral-100 bg-neutral-50/70 p-3">
               <dt className="font-semibold text-neutral-900">User ID</dt>
-              <dd className="mt-1 break-all text-neutral-700">{session.user?.id}</dd>
+              <dd className="mt-1 break-all text-neutral-700">{session?.user?.id}</dd>
             </div>
             <div className="rounded-lg border border-neutral-100 bg-neutral-50/70 p-3">
               <dt className="font-semibold text-neutral-900">Email</dt>
-              <dd className="mt-1 text-neutral-700">{session.user?.email}</dd>
+              <dd className="mt-1 text-neutral-700">{session?.user?.email}</dd>
             </div>
           </dl>
           <p className="mt-4 text-xs text-neutral-500">

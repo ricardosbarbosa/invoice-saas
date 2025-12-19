@@ -20,7 +20,7 @@ function slugify(value: string) {
 export default function OrganizationSelectPage() {
   const router = useRouter()
   const { data: activeOrg } = useActiveOrganization()
-  const { data: orgs, isPending } = useListOrganizations()
+  const { data: organizations, isPending } = useListOrganizations()
   const [name, setName] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, startTransition] = useTransition()
@@ -31,7 +31,7 @@ export default function OrganizationSelectPage() {
     }
   }, [activeOrg, router])
 
-  const hasOrganizations = useMemo(() => (orgs?.organizations?.length ?? 0) > 0, [orgs])
+  const hasOrganizations = useMemo(() => (organizations?.length ?? 0) > 0, [organizations])
 
   const handleCreate = (event: React.FormEvent) => {
     event.preventDefault()
@@ -95,7 +95,7 @@ export default function OrganizationSelectPage() {
               <p className="text-sm text-neutral-600">Loading organizations...</p>
             ) : hasOrganizations ? (
               <div className="space-y-3">
-                {orgs?.organizations?.map((org) => (
+                {organizations?.map((org) => (
                   <div
                     key={org.id}
                     className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white px-4 py-3 shadow-sm"
