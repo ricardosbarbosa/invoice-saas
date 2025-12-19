@@ -28,7 +28,6 @@ const data = {
       title: "Sales",
       url: "#",
       icon: FileText,
-      isActive: true,
       items: [
         {
           title: "Clients",
