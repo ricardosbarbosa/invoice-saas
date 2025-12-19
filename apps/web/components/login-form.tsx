@@ -38,7 +38,7 @@ export function LoginForm({
     resetMessages()
 
     startTransition(async () => {
-      await signIn.email({email, password, callbackURL: "/"})
+      await signIn.email({ email, password, callbackURL: "/organizations/select" })
     })
   }
   if (isPendingAction) {
