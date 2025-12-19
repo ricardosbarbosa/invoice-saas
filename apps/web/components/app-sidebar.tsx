@@ -15,7 +15,7 @@ import {
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { OrganizationSwitcher } from "@/components/organization-switcher"
 import {
   organization,
   useActiveOrganization,
@@ -147,17 +147,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: activeOrganization } = useActiveOrganization()
   const [isSwitching, startTransition] = React.useTransition()
 
-  const teams = (organizations ?? []).map((org) => ({
+  const orgs = (organizations ?? []).map((org) => ({
     id: org.id,
     name: org.name,
     plan: org.slug ?? "Organization",
     logo: Building2,
   }))
 
-  const handleSelectTeam = (team: (typeof teams)[number]) => {
+  const handleSelectOrganization = (orgItem: (typeof orgs)[number]) => {
     startTransition(async () => {
       await organization.setActive(
-        { organizationId: team.id },
+        { organizationId: orgItem.id },
         {
           onSuccess: () => {
             router.refresh()
@@ -167,7 +167,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     })
   }
 
-  const handleAddTeam = () => {
+  const handleAddOrganization = () => {
     router.push("/organizations/select")
   }
 
@@ -180,11 +180,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher
-          teams={teams}
-          activeTeamId={activeOrganization?.id}
-          onSelectTeam={handleSelectTeam}
-          onAddTeam={handleAddTeam}
+        <OrganizationSwitcher
+          organizations={orgs}
+          activeOrganizationId={activeOrganization?.id}
+          onSelectOrganization={handleSelectOrganization}
+          onAddOrganization={handleAddOrganization}
           isBusy={isSwitching || isOrganizationsLoading}
         />
       </SidebarHeader>

@@ -19,35 +19,40 @@ import {
   useSidebar,
 } from "@workspace/ui/components/sidebar"
 
-type Team = {
+type Organization = {
   id: string
   name: string
   plan?: string | null
   logo?: React.ElementType
 }
 
-export function TeamSwitcher({
-  teams,
-  activeTeamId,
-  onSelectTeam,
-  onAddTeam,
+export function OrganizationSwitcher({
+  organizations,
+  activeOrganizationId,
+  onSelectOrganization,
+  onAddOrganization,
   isBusy,
 }: {
-  teams: Team[]
-  activeTeamId?: string | null
-  onSelectTeam?: (team: Team) => void
-  onAddTeam?: () => void
+  organizations: Organization[]
+  activeOrganizationId?: string | null
+  onSelectOrganization?: (organization: Organization) => void
+  onAddOrganization?: () => void
   isBusy?: boolean
 }) {
   const { isMobile } = useSidebar()
-  const activeTeam =
-    teams.find((team) => team.id === activeTeamId) ?? teams[0]
+  const activeOrganization =
+    organizations.find((organization) => organization.id === activeOrganizationId) ??
+    organizations[0]
 
-  if (!activeTeam) {
+  if (!activeOrganization) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" onClick={onAddTeam} disabled={isBusy}>
+          <SidebarMenuButton
+            size="lg"
+            onClick={onAddOrganization}
+            disabled={isBusy}
+          >
             <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
               <Building2 className="size-4" />
             </div>
@@ -63,7 +68,7 @@ export function TeamSwitcher({
     )
   }
 
-  const ActiveLogo = activeTeam.logo ?? Building2
+  const ActiveLogo = activeOrganization.logo ?? Building2
 
   return (
     <SidebarMenu>
@@ -78,9 +83,11 @@ export function TeamSwitcher({
                 <ActiveLogo className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{activeTeam.name}</span>
+                <span className="truncate font-medium">
+                  {activeOrganization.name}
+                </span>
                 <span className="truncate text-xs">
-                  {activeTeam.plan ?? "Organization"}
+                  {activeOrganization.plan ?? "Organization"}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -95,22 +102,22 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               Organizations
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {organizations.map((organization, index) => (
               <DropdownMenuItem
-                key={team.id}
-                onClick={() => onSelectTeam?.(team)}
+                key={organization.id}
+                onClick={() => onSelectOrganization?.(organization)}
                 className="gap-2 p-2"
                 disabled={isBusy}
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
-                  {team.logo ? (
-                    <team.logo className="size-3.5 shrink-0" />
+                  {organization.logo ? (
+                    <organization.logo className="size-3.5 shrink-0" />
                   ) : (
                     <Building2 className="size-3.5 shrink-0" />
                   )}
                 </div>
-                <span className="flex-1">{team.name}</span>
-                {team.id === activeTeam.id ? (
+                <span className="flex-1">{organization.name}</span>
+                {organization.id === activeOrganization.id ? (
                   <Check className="size-4 text-muted-foreground" />
                 ) : (
                   <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
@@ -120,7 +127,7 @@ export function TeamSwitcher({
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="gap-2 p-2"
-              onClick={onAddTeam}
+              onClick={onAddOrganization}
               disabled={isBusy}
             >
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
