@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState, useTransition } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { organization, useActiveOrganization, useListOrganizations } from "@/lib/auth-client"
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
@@ -19,17 +19,19 @@ function slugify(value: string) {
 
 export default function OrganizationSelectPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { data: activeOrg } = useActiveOrganization()
   const { data: organizations, isPending } = useListOrganizations()
   const [name, setName] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, startTransition] = useTransition()
+  const allowExisting = searchParams.get("mode") === "manage"
 
   useEffect(() => {
-    if (activeOrg) {
+    if (activeOrg && !allowExisting) {
       router.replace("/")
     }
-  }, [activeOrg, router])
+  }, [activeOrg, allowExisting, router])
 
   const hasOrganizations = useMemo(() => (organizations?.length ?? 0) > 0, [organizations])
 

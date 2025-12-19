@@ -168,7 +168,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   const handleAddOrganization = () => {
-    router.push("/organizations/select")
+    router.push("/organizations/select?mode=manage")
   }
 
   const user = {
