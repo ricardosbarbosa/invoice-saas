@@ -1,5 +1,6 @@
 "use client"
 
+import type { authClient } from "@/lib/auth-client"
 import {
   BadgeCheck,
   Bell,
@@ -30,18 +31,17 @@ import {
   useSidebar,
 } from "@workspace/ui/components/sidebar"
 
+type AuthSession = (typeof authClient)["$Infer"]["Session"]
+type AuthUser = AuthSession["user"]
+
 export function NavUser({
   user,
 }: {
-  user: {
-    name?: string | null
-    email?: string | null
-    avatar?: string | null
-  }
+  user?: AuthUser | null
 }) {
   const { isMobile } = useSidebar()
-  const name = user.name?.trim() || user.email || "User"
-  const email = user.email || "Unknown"
+  const name = user?.name?.trim() || user?.email || "User"
+  const email = user?.email || "Unknown"
   const initials = name
     .split(" ")
     .filter(Boolean)
@@ -59,7 +59,7 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar ?? undefined} alt={name} />
+                <AvatarImage src={user?.image ?? undefined} alt={name} />
                 <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -78,7 +78,7 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar ?? undefined} alt={name} />
+                  <AvatarImage src={user?.image ?? undefined} alt={name} />
                   <AvatarFallback className="rounded-lg">
                     {initials}
                   </AvatarFallback>

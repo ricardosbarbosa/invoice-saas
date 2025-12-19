@@ -163,11 +163,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     router.push("/organizations/select?mode=manage")
   }
 
-  const user = {
-    name: session?.user?.name ?? session?.user?.email ?? "User",
-    email: session?.user?.email ?? "",
-    avatar: session?.user?.image ?? null,
-  }
+  const user = session?.user ?? null
 
   return (
     <Sidebar collapsible="icon" {...props}>
