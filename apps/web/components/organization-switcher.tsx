@@ -1,7 +1,7 @@
 "use client"
 
-import * as React from "react"
 import { Building2, Check, ChevronsUpDown, Plus } from "lucide-react"
+import type { Organization } from "better-auth/plugins"
 
 import {
   DropdownMenu,
@@ -18,13 +18,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@workspace/ui/components/sidebar"
-
-type Organization = {
-  id: string
-  name: string
-  plan?: string | null
-  logo?: React.ElementType
-}
 
 export function OrganizationSwitcher({
   organizations,
@@ -43,6 +36,15 @@ export function OrganizationSwitcher({
   const activeOrganization =
     organizations.find((organization) => organization.id === activeOrganizationId) ??
     organizations[0]
+
+  const logoStyle = (logo?: string | null) =>
+    logo
+      ? {
+          backgroundImage: `url(${logo})`,
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }
+      : undefined
 
   if (!activeOrganization) {
     return (
@@ -68,8 +70,6 @@ export function OrganizationSwitcher({
     )
   }
 
-  const ActiveLogo = activeOrganization.logo ?? Building2
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -79,15 +79,20 @@ export function OrganizationSwitcher({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <ActiveLogo className="size-4" />
+              <div
+                className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
+                style={logoStyle(activeOrganization.logo)}
+              >
+                {activeOrganization.logo ? null : (
+                  <Building2 className="size-4" />
+                )}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
                   {activeOrganization.name}
                 </span>
                 <span className="truncate text-xs">
-                  {activeOrganization.plan ?? "Organization"}
+                  {activeOrganization.slug || "Organization"}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -109,10 +114,11 @@ export function OrganizationSwitcher({
                 className="gap-2 p-2"
                 disabled={isBusy}
               >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  {organization.logo ? (
-                    <organization.logo className="size-3.5 shrink-0" />
-                  ) : (
+                <div
+                  className="flex size-6 items-center justify-center rounded-md border"
+                  style={logoStyle(organization.logo)}
+                >
+                  {organization.logo ? null : (
                     <Building2 className="size-3.5 shrink-0" />
                   )}
                 </div>

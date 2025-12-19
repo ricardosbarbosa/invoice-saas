@@ -4,7 +4,6 @@ import * as React from "react"
 import {
   BookOpen,
   Bot,
-  Building2,
   Frame,
   Map,
   PieChart,
@@ -24,6 +23,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@workspace/ui/components/sidebar"
+import type { Organization } from "better-auth/plugins"
 import { useRouter } from "next/navigation"
 
 // This is sample data.
@@ -144,14 +144,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: activeOrganization } = useActiveOrganization()
   const [isSwitching, startTransition] = React.useTransition()
 
-  const orgs = (organizations ?? []).map((org) => ({
-    id: org.id,
-    name: org.name,
-    plan: org.slug ?? "Organization",
-    logo: Building2,
-  }))
+  const orgs: Organization[] = organizations ?? []
 
-  const handleSelectOrganization = (orgItem: (typeof orgs)[number]) => {
+  const handleSelectOrganization = (orgItem: Organization) => {
     startTransition(async () => {
       await organization.setActive(
         { organizationId: orgItem.id },
