@@ -1,6 +1,6 @@
 import { prisma } from "@workspace/db"
 import { betterAuth } from "better-auth"
-import { admin } from "better-auth/plugins"
+import { admin, organization } from "better-auth/plugins"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 
 const trustedOrigins: string[] = (process.env.CORS_ORIGIN ?? "")
@@ -25,7 +25,8 @@ export const auth = betterAuth({
        * Admin role is inferred from the user's role field (default "admin").
        * No adminUserIds override so roles drive access control.
        */
-    })
+    }),
+    organization({})
   ]
 })
 
