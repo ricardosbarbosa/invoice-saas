@@ -39,5 +39,5 @@ export async function getServerSession() {
   }
 
   const data: SessionResponse = await res.json()
-  return data.session && data.user ? data : null
+  return data?.session && data?.user ? data : null
 }
