@@ -11,7 +11,7 @@
   "scripts": {
     "prebuild": "pnpm --filter @workspace/auth build",
     "build": "tsc -p tsconfig.json",
-    "check-types": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p test/tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p test/tsconfig.json",
     "dev": "pnpm run build && concurrently -k -p \"[{name}]\" -n \"types,api\" -c \"yellow.bold,cyan.bold\" \"pnpm run dev:types\" \"pnpm run dev:start\"",
     "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
     "dev:types": "tsc -w --preserveWatchOutput -p tsconfig.json",
