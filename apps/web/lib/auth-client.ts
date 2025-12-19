@@ -14,13 +14,3 @@ export const authClient = createAuthClient({
     organizationClient()
   ]
 })
-
-export const {
-  signIn,
-  signUp,
-  signOut,
-  useSession,
-  organization,
-  useListOrganizations,
-  useActiveOrganization
-} = authClient

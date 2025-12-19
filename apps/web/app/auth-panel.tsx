@@ -1,10 +1,11 @@
 "use client"
 
 import React, { useState, useTransition } from "react"
-import { signIn, signOut, signUp, useSession } from "../lib/auth-client"
+import { authClient } from "../lib/auth-client"
 import { Button } from "@workspace/ui/components/button"
 
 export function AuthPanel() {
+  const { signIn, signOut, signUp, useSession } = authClient
   const { data: session, isPending } = useSession()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")

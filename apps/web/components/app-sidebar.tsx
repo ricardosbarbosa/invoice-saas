@@ -16,12 +16,7 @@ import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { OrganizationSwitcher } from "@/components/organization-switcher"
-import {
-  organization,
-  useActiveOrganization,
-  useListOrganizations,
-  useSession,
-} from "@/lib/auth-client"
+import { authClient } from "@/lib/auth-client"
 import {
   Sidebar,
   SidebarContent,
@@ -106,7 +101,7 @@ const data = {
           url: "#",
         },
         {
-          title: "Team",
+          title: "Organization",
           url: "#",
         },
         {
@@ -141,6 +136,8 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter()
+  const { useSession, useListOrganizations, useActiveOrganization, organization } =
+    authClient
   const { data: session } = useSession()
   const { data: organizations, isPending: isOrganizationsLoading } =
     useListOrganizations()

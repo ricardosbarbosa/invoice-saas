@@ -16,7 +16,7 @@ import {
 } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
 import { useState, useTransition } from "react"
-import { signIn } from "@/lib/auth-client"
+import { authClient } from "@/lib/auth-client"
 
 export function LoginForm({
   className,
@@ -38,7 +38,7 @@ export function LoginForm({
     resetMessages()
 
     startTransition(async () => {
-      await signIn.email({ email, password, callbackURL: "/organizations/select" })
+      await authClient.signIn.email({ email, password, callbackURL: "/organizations/select" })
     })
   }
   if (isPendingAction) {

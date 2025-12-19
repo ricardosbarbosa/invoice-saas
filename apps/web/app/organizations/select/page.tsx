@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { organization, useActiveOrganization, useListOrganizations } from "@/lib/auth-client"
+import { authClient } from "@/lib/auth-client"
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@workspace/ui/components/field"
@@ -20,6 +20,7 @@ function slugify(value: string) {
 export default function OrganizationSelectPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { useActiveOrganization, useListOrganizations, organization } = authClient
   const { data: activeOrg } = useActiveOrganization()
   const { data: organizations, isPending } = useListOrganizations()
   const [name, setName] = useState("")
