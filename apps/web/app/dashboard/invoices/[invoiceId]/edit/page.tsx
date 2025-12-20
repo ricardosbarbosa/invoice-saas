@@ -34,11 +34,11 @@ type Invoice = {
 }
 
 type PageProps = {
-  params: { invoiceId: string }
+  params: Promise<{ invoiceId: string }>
 }
 
 export default async function Page({ params }: PageProps) {
-  const response = await apiFetch(`/invoices/${params.invoiceId}`)
+  const response = await apiFetch(`/invoices/${(await params).invoiceId}`)
   if (response.status === 404) {
     notFound()
   }

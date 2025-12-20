@@ -13,11 +13,11 @@ import { Separator } from "@workspace/ui/components/separator"
 import { SidebarTrigger } from "@workspace/ui/components/sidebar"
 
 type PageProps = {
-  searchParams?: { clientId?: string | string[] }
+  searchParams?: Promise<{ clientId?: string | string[] }>
 }
 
-export default function Page({ searchParams }: PageProps) {
-  const clientIdParam = searchParams?.clientId
+export default async function Page({ searchParams }: PageProps) {
+  const clientIdParam = (await searchParams)?.clientId
   const clientId = Array.isArray(clientIdParam)
     ? clientIdParam[0]
     : clientIdParam
