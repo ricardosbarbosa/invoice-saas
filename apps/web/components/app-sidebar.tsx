@@ -59,6 +59,10 @@ const data = {
           title: "Members & Roles",
           url: "/dashboard/settings/roles",
         },
+        {
+          title: "Invitations",
+          url: "/dashboard/organizations/invitations",
+        },
       ],
     },
   ],
