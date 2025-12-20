@@ -44,6 +44,8 @@ model User {
   members     Member[]
   invitations Invitation[]
 
+  passkeys Passkey[]
+
   @@map("user")
 }
 
@@ -100,17 +102,17 @@ model Verification {
 }
 
 model Organization {
-  id          String       @id
-  name        String
-  slug        String
-  logo        String?
-  createdAt   DateTime
-  metadata    String?
-  members     Member[]
-  invitations Invitation[]
-  clients     Client[]
-  invoices    Invoice[]
-  invoiceSettings InvoiceSettings?
+  id                String             @id
+  name              String
+  slug              String
+  logo              String?
+  createdAt         DateTime
+  metadata          String?
+  members           Member[]
+  invitations       Invitation[]
+  clients           Client[]
+  invoices          Invoice[]
+  invoiceSettings   InvoiceSettings?
   organizationRoles OrganizationRole[]
 
   @@unique([slug])
@@ -242,4 +244,23 @@ model InvoiceItem {
 
   @@index([invoiceId])
   @@map("invoice_item")
+}
+
+model Passkey {
+  id           String    @id
+  name         String?
+  publicKey    String
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialID String
+  counter      Int
+  deviceType   String
+  backedUp     Boolean
+  transports   String?
+  createdAt    DateTime?
+  aaguid       String?
+
+  @@index([userId])
+  @@index([credentialID])
+  @@map("passkey")
 }
