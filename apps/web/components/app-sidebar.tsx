@@ -5,6 +5,7 @@ import {
   FileText,
   Users,
   Settings2,
+  LockIcon
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -62,6 +63,21 @@ const data = {
         {
           title: "Invitations",
           url: "/dashboard/organizations/invitations",
+        },
+      ],
+    },
+    {
+      title: "Admin",
+      url: "#",
+      icon: LockIcon,
+      items: [
+        {
+          title: "Users",
+          url: "/dashboard/admin/users",
+        },
+        {
+          title: "Stop Impersonate",
+          url: "/dashboard/admin/stop-impersonating",
         },
       ],
     },
