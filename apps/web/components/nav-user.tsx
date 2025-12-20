@@ -31,6 +31,7 @@ import {
   useSidebar,
 } from "@workspace/ui/components/sidebar"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 type AuthSession = (typeof authClient)["$Infer"]["Session"]
 type AuthUser = AuthSession["user"]
@@ -105,17 +106,11 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/settings/account">
                 <BadgeCheck />
                 Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
