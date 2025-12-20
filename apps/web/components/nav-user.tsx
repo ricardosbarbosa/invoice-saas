@@ -1,6 +1,6 @@
 "use client"
 
-import type { authClient } from "@/lib/auth-client"
+import { authClient } from "@/lib/auth-client"
 import {
   BadgeCheck,
   Bell,
@@ -30,6 +30,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@workspace/ui/components/sidebar"
+import { useRouter } from "next/navigation"
 
 type AuthSession = (typeof authClient)["$Infer"]["Session"]
 type AuthUser = AuthSession["user"]
@@ -40,6 +41,7 @@ export function NavUser({
   user?: AuthUser | null
 }) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
   const name = user?.name?.trim() || user?.email || "User"
   const email = user?.email || "Unknown"
   const initials = name
@@ -48,6 +50,11 @@ export function NavUser({
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join("") || "U"
+
+  const handleSignOut = async () => {
+    await authClient.signOut()
+    router.push("/")
+  }
 
   return (
     <SidebarMenu>
@@ -112,7 +119,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onSelect={handleSignOut} disabled={!user}>
               <LogOut />
               Log out
             </DropdownMenuItem>
