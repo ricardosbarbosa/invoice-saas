@@ -24,6 +24,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         error: <OctagonXIcon className="size-4" />,
         loading: <Loader2Icon className="size-4 animate-spin" />,
       }}
+      // @ts-expect-error - CSSProperties is not assignable to Properties<string | number, string & {}>
       style={
         {
           "--normal-bg": "var(--popover)",
@@ -38,3 +39,4 @@ const Toaster = ({ ...props }: ToasterProps) => {
 }
 
 export { Toaster }
+export { toast } from "sonner"

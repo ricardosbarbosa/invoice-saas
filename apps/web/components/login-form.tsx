@@ -17,6 +17,7 @@ import {
 import { Input } from "@workspace/ui/components/input"
 import { useState, useTransition } from "react"
 import { authClient } from "@/lib/auth-client"
+import { toast } from "@workspace/ui/components/sonner"
 
 export function LoginForm({
   className,
@@ -24,32 +25,29 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
+  
   const [isPendingAction, startTransition] = useTransition()
-
-  const resetMessages = () => {
-    setError(null)
-    setSuccess(null)
-  }
 
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault()
-    resetMessages()
 
     startTransition(async () => {
-      await authClient.signIn.email({ email, password, callbackURL: "/organizations/select" })
+      try {
+        const result = await authClient.signIn.email({
+          email,
+          password,
+          callbackURL: "/organizations/select",
+        })
+
+        if (result?.error) {
+          toast.error(result.error.message ?? "Invalid email or password.")
+        }
+      } catch {
+        toast.error("Unable to sign in. Please try again.")
+      }
     })
   }
-  if (isPendingAction) {
-    return <div>Loading...</div>
-  }
-  if (error) {
-    return <div>{error}</div>
-  }
-  if (success) {
-    return <div>{success}</div>
-  }
+  
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
