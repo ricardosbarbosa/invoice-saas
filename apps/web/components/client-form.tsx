@@ -39,8 +39,14 @@ const clientFormSchema = z.object({
 
 type ClientFormValues = z.infer<typeof clientFormSchema>
 
-export function ClientForm() {
+type ClientFormProps = {
+  clientId?: string
+  initialValues?: Partial<ClientFormValues>
+}
+
+export function ClientForm({ clientId, initialValues }: ClientFormProps) {
   const router = useRouter()
+  const isEditing = Boolean(clientId)
   const {
     register,
     handleSubmit,
@@ -49,24 +55,25 @@ export function ClientForm() {
   } = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      taxId: "",
-      addressLine1: "",
-      addressLine2: "",
-      city: "",
-      state: "",
-      postalCode: "",
-      country: "",
-      currency: "",
-      notes: "",
+      name: initialValues?.name ?? "",
+      email: initialValues?.email ?? "",
+      phone: initialValues?.phone ?? "",
+      taxId: initialValues?.taxId ?? "",
+      addressLine1: initialValues?.addressLine1 ?? "",
+      addressLine2: initialValues?.addressLine2 ?? "",
+      city: initialValues?.city ?? "",
+      state: initialValues?.state ?? "",
+      postalCode: initialValues?.postalCode ?? "",
+      country: initialValues?.country ?? "",
+      currency: initialValues?.currency ?? "",
+      notes: initialValues?.notes ?? "",
     },
   })
 
   const onSubmit = async (values: ClientFormValues) => {
-    const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/clients`, {
-      method: "POST",
+    const endpoint = clientId ? `/clients/${clientId}` : "/clients"
+    const response = await fetch(`${env.NEXT_PUBLIC_API_URL}${endpoint}`, {
+      method: isEditing ? "PATCH" : "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
@@ -75,11 +82,24 @@ export function ClientForm() {
     })
 
     if (!response.ok) {
-      setError("root", { message: "Unable to create client." })
+      setError("root", {
+        message: isEditing ? "Unable to update client." : "Unable to create client.",
+      })
       return
     }
 
-    router.push("/dashboard/clients")
+    if (isEditing) {
+      router.push(`/dashboard/clients/${clientId}`)
+      router.refresh()
+      return
+    }
+
+    const payload = (await response.json().catch(() => null)) as
+      | { client?: { id?: string } }
+      | null
+    const nextId = payload?.client?.id
+
+    router.push(nextId ? `/dashboard/clients/${nextId}` : "/dashboard/clients")
     router.refresh()
   }
 
@@ -216,7 +236,11 @@ export function ClientForm() {
 
       <div className="flex items-center gap-2">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Create client"}
+          {isSubmitting
+            ? "Saving..."
+            : isEditing
+              ? "Update client"
+              : "Create client"}
         </Button>
       </div>
     </form>

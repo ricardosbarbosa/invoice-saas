@@ -73,8 +73,32 @@ const invoiceFormSchema = z
 
 type InvoiceFormValues = z.infer<typeof invoiceFormSchema>
 
-export function InvoiceForm() {
+type InvoiceFormProps = {
+  invoiceId?: string
+  initialValues?: Partial<InvoiceFormValues>
+}
+
+const toDateInput = (value?: string | null) =>
+  value ? new Date(value).toISOString().slice(0, 10) : ""
+
+const toStringOrEmpty = (value: unknown) =>
+  value === null || value === undefined ? "" : String(value)
+
+export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
   const router = useRouter()
+  const isEditing = Boolean(invoiceId)
+  const defaultItems =
+    initialValues?.items && initialValues.items.length > 0
+      ? initialValues.items.map((item) => ({
+          description: item.description ?? "",
+          quantity:
+            item.quantity === null || item.quantity === undefined
+              ? "1"
+              : String(item.quantity),
+          unitPrice: toStringOrEmpty(item.unitPrice),
+          taxRate: toStringOrEmpty(item.taxRate),
+        }))
+      : [{ description: "", quantity: "1", unitPrice: "", taxRate: "" }]
   const {
     control,
     register,
@@ -84,17 +108,17 @@ export function InvoiceForm() {
   } = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
     defaultValues: {
-      clientId: "",
-      issueDate: "",
-      dueDate: "",
-      currency: "",
-      discountType: undefined,
-      discountValue: "",
-      shippingAmount: "",
-      shippingTaxRate: "",
-      notes: "",
-      terms: "",
-      items: [{ description: "", quantity: "1", unitPrice: "", taxRate: "" }],
+      clientId: initialValues?.clientId ?? "",
+      issueDate: toDateInput(initialValues?.issueDate),
+      dueDate: toDateInput(initialValues?.dueDate),
+      currency: initialValues?.currency ?? "",
+      discountType: initialValues?.discountType ?? "",
+      discountValue: toStringOrEmpty(initialValues?.discountValue),
+      shippingAmount: toStringOrEmpty(initialValues?.shippingAmount),
+      shippingTaxRate: toStringOrEmpty(initialValues?.shippingTaxRate),
+      notes: initialValues?.notes ?? "",
+      terms: initialValues?.terms ?? "",
+      items: defaultItems,
     },
   })
 
@@ -104,16 +128,19 @@ export function InvoiceForm() {
   })
 
   const onSubmit = async (values: InvoiceFormValues) => {
+    const { clientId, ...payloadBase } = values
     const payload = {
-      ...values,
+      ...payloadBase,
       issueDate: values.issueDate
         ? new Date(values.issueDate).toISOString()
         : undefined,
       dueDate: values.dueDate ? new Date(values.dueDate).toISOString() : undefined,
+      ...(isEditing ? {} : { clientId }),
     }
 
-    const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/invoices`, {
-      method: "POST",
+    const endpoint = invoiceId ? `/invoices/${invoiceId}` : "/invoices"
+    const response = await fetch(`${env.NEXT_PUBLIC_API_URL}${endpoint}`, {
+      method: isEditing ? "PATCH" : "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
@@ -122,11 +149,24 @@ export function InvoiceForm() {
     })
 
     if (!response.ok) {
-      setError("root", { message: "Unable to create invoice." })
+      setError("root", {
+        message: isEditing ? "Unable to update invoice." : "Unable to create invoice.",
+      })
       return
     }
 
-    router.push("/dashboard/invoices")
+    if (isEditing) {
+      router.push(`/dashboard/invoices/${invoiceId}`)
+      router.refresh()
+      return
+    }
+
+    const payloadResponse = (await response.json().catch(() => null)) as
+      | { invoice?: { id?: string } }
+      | null
+    const nextId = payloadResponse?.invoice?.id
+
+    router.push(nextId ? `/dashboard/invoices/${nextId}` : "/dashboard/invoices")
     router.refresh()
   }
 
@@ -137,7 +177,12 @@ export function InvoiceForm() {
           <Field>
             <FieldLabel htmlFor="clientId">Client ID</FieldLabel>
             <FieldContent>
-              <Input id="clientId" {...register("clientId")} aria-invalid={!!errors.clientId} />
+              <Input
+                id="clientId"
+                {...register("clientId")}
+                readOnly={isEditing}
+                aria-invalid={!!errors.clientId}
+              />
               <FieldError errors={[errors.clientId]} />
             </FieldContent>
           </Field>
@@ -285,7 +330,11 @@ export function InvoiceForm() {
 
       <div className="flex items-center gap-2">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Create invoice"}
+          {isSubmitting
+            ? "Saving..."
+            : isEditing
+              ? "Update invoice"
+              : "Create invoice"}
         </Button>
       </div>
     </form>

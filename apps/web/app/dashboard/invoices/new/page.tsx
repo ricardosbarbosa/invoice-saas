@@ -12,7 +12,16 @@ import {
 import { Separator } from "@workspace/ui/components/separator"
 import { SidebarTrigger } from "@workspace/ui/components/sidebar"
 
-export default function Page() {
+type PageProps = {
+  searchParams?: { clientId?: string | string[] }
+}
+
+export default function Page({ searchParams }: PageProps) {
+  const clientIdParam = searchParams?.clientId
+  const clientId = Array.isArray(clientIdParam)
+    ? clientIdParam[0]
+    : clientIdParam
+
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2">
@@ -39,7 +48,7 @@ export default function Page() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <InvoiceForm />
+            <InvoiceForm initialValues={{ clientId: clientId ?? "" }} />
           </CardContent>
         </Card>
       </div>
