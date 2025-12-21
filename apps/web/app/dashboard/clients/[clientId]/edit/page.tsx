@@ -1,53 +1,77 @@
-import Link from "next/link"
-import { notFound } from "next/navigation"
+"use client";
 
-import { ClientForm } from "@/components/client-form"
-import { apiFetch } from "@/lib/api"
-import { Button } from "@workspace/ui/components/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
-import { Separator } from "@workspace/ui/components/separator"
-import { SidebarTrigger } from "@workspace/ui/components/sidebar"
+import Link from "next/link";
+import { notFound, useParams } from "next/navigation";
 
-type Client = {
-  id: string
-  name: string
-  email?: string | null
-  phone?: string | null
-  taxId?: string | null
-  addressLine1?: string | null
-  addressLine2?: string | null
-  city?: string | null
-  state?: string | null
-  postalCode?: string | null
-  country?: string | null
-  currency?: string | null
-  notes?: string | null
-}
+import { ClientForm, ClientFormValues } from "@/components/client-form";
+import { Button } from "@workspace/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+import PageHeader from "@/components/page-header";
+import {
+  useGetClientByIdQuery,
+  useUpdateClientMutation,
+} from "@/lib/store/clients";
+import { toast } from "@workspace/ui/components/sonner";
 
-type PageProps = {
-  params: Promise<{ clientId: string }>
-}
+export default function Page() {
+  const params = useParams();
+  const {
+    data: client,
+    isLoading,
+    error,
+  } = useGetClientByIdQuery({ clientId: params.clientId as string });
 
-export default async function Page({ params }: PageProps) {
-  const response = await apiFetch(`/clients/${(await params).clientId}`)
-  console.log(response)
-  if (response.status === 404) {
-    notFound()
+  const [updateClient] = useUpdateClientMutation();
+
+  const onSubmit = async (values: ClientFormValues) => {
+    try {
+      await updateClient({
+        clientId: params.clientId as string,
+        client: values,
+      });
+      toast.success("Client updated successfully.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Unable to update client.");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <Card>
+          <CardHeader>
+            <CardTitle>Edit client</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-muted-foreground text-sm">Loading...</div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
-  if (!response.ok) {
+  if (!client) {
+    notFound();
+  }
+
+  if (error) {
     return (
       <>
-        <header className="flex h-16 shrink-0 items-center gap-2">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <h1 className="text-lg font-semibold">Edit client</h1>
-          </div>
-        </header>
+        <PageHeader
+          title="Edit client"
+          actions={
+            <Button variant="outline" asChild>
+              <Link href="/dashboard/clients">Back to clients</Link>
+            </Button>
+          }
+        />
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <Card>
             <CardHeader>
@@ -64,29 +88,19 @@ export default async function Page({ params }: PageProps) {
           </Card>
         </div>
       </>
-    )
+    );
   }
-
-  const data = (await response.json()) as { client: Client }
-  const client = data.client
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
-          <h1 className="text-lg font-semibold">Edit client</h1>
-        </div>
-        <div className="ml-auto px-4">
+      <PageHeader
+        title="Edit client"
+        actions={
           <Button variant="outline" asChild>
-            <Link href={`/dashboard/clients/${client.id}`}>Back to client</Link>
+            <Link href="/dashboard/clients">Back to clients</Link>
           </Button>
-        </div>
-      </header>
+        }
+      />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <Card>
           <CardHeader>
@@ -112,10 +126,11 @@ export default async function Page({ params }: PageProps) {
                 currency: client.currency ?? "",
                 notes: client.notes ?? "",
               }}
+              onSubmit={onSubmit}
             />
           </CardContent>
         </Card>
       </div>
     </>
-  )
+  );
 }

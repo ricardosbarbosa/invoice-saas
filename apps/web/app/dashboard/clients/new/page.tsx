@@ -1,35 +1,42 @@
-import Link from "next/link"
+"use client";
+import Link from "next/link";
 
-import { ClientForm } from "@/components/client-form"
-import { Button } from "@workspace/ui/components/button"
+import { ClientForm, ClientFormValues } from "@/components/client-form";
+import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card"
-import { Separator } from "@workspace/ui/components/separator"
-import { SidebarTrigger } from "@workspace/ui/components/sidebar"
+} from "@workspace/ui/components/card";
+import PageHeader from "@/components/page-header";
+import { useCreateClientMutation } from "@/lib/store/clients";
+import { toast } from "@workspace/ui/components/sonner";
 
 export default function Page() {
+  const [createClient] = useCreateClientMutation();
+
+  const onSubmit = async (values: ClientFormValues) => {
+    try {
+      await createClient({ client: values });
+      toast.success("Client created successfully.");
+    } catch (error) {
+      console.error(error);
+      toast.error("Unable to create client.");
+    }
+  };
+
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
-          <h1 className="text-lg font-semibold">New client</h1>
-        </div>
-        <div className="ml-auto px-4">
+      <PageHeader
+        title="New client"
+        actions={
           <Button variant="outline" asChild>
             <Link href="/dashboard/clients">Back to clients</Link>
           </Button>
-        </div>
-      </header>
+        }
+      />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <Card>
           <CardHeader>
@@ -39,10 +46,10 @@ export default function Page() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ClientForm />
+            <ClientForm onSubmit={onSubmit} />
           </CardContent>
         </Card>
       </div>
     </>
-  )
+  );
 }

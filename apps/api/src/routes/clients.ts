@@ -1,13 +1,19 @@
-import type { FastifyPluginAsync } from "fastify"
-import { z } from "zod"
-import { getActiveOrganizationId, requireOrgPermission } from "../lib/organization"
+import type { FastifyPluginAsync } from "fastify";
+import { z } from "zod";
+import {
+  getActiveOrganizationId,
+  requireOrgPermission,
+} from "../lib/organization";
 
 const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
-  z.preprocess((value) => (value === "" ? undefined : value), schema.optional())
+  z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    schema.optional()
+  );
 
-const optionalString = emptyToUndefined(z.string())
-const optionalEmail = emptyToUndefined(z.string().email())
-const optionalCurrency = emptyToUndefined(z.string().length(3))
+const optionalString = emptyToUndefined(z.string());
+const optionalEmail = emptyToUndefined(z.string().email());
+const optionalCurrency = emptyToUndefined(z.string().length(3));
 
 const clientSchema = z.object({
   name: z.string().min(1),
@@ -22,112 +28,134 @@ const clientSchema = z.object({
   country: optionalString,
   currency: optionalCurrency,
   notes: optionalString,
-})
+});
 
 const clientUpdateSchema = clientSchema.partial().extend({
   status: z.enum(["active", "archived"]).optional(),
-})
+});
 
 const paramsSchema = z.object({
   clientId: z.string().min(1),
-})
+});
 
 const clients: FastifyPluginAsync = async (fastify) => {
   fastify.get(
     "/clients",
     { preHandler: fastify.authGuard },
     async (request, reply) => {
-      const organizationId = getActiveOrganizationId(request, reply)
-      if (!organizationId) return
+      const organizationId = getActiveOrganizationId(request, reply);
+      if (!organizationId) return;
 
-      const allowed = await requireOrgPermission(request, reply, {
-        client: ["read"],
-      }, organizationId)
-      if (!allowed) return
+      const allowed = await requireOrgPermission(
+        request,
+        reply,
+        {
+          client: ["read"],
+        },
+        organizationId
+      );
+      if (!allowed) return;
 
       const clients = await fastify.prisma.client.findMany({
         where: { organizationId },
+        include: { organization: true },
         orderBy: { name: "asc" },
-      })
+      });
 
-      return { clients }
+      return { data: clients };
     }
-  )
+  );
 
   fastify.post(
     "/clients",
     { preHandler: fastify.authGuard },
     async (request, reply) => {
-      const organizationId = getActiveOrganizationId(request, reply)
-      if (!organizationId) return
+      const organizationId = getActiveOrganizationId(request, reply);
+      if (!organizationId) return;
 
-      const allowed = await requireOrgPermission(request, reply, {
-        client: ["create"],
-      }, organizationId)
-      if (!allowed) return
+      const allowed = await requireOrgPermission(
+        request,
+        reply,
+        {
+          client: ["create"],
+        },
+        organizationId
+      );
+      if (!allowed) return;
 
-      const body = clientSchema.parse(request.body)
+      const body = clientSchema.parse(request.body);
       const client = await fastify.prisma.client.create({
         data: {
           organizationId,
           ...body,
           currency: body.currency?.toUpperCase(),
         },
-      })
+      });
 
-      reply.code(201)
-      return { client }
+      reply.code(201);
+      return client;
     }
-  )
+  );
 
   fastify.get(
     "/clients/:clientId",
     { preHandler: fastify.authGuard },
     async (request, reply) => {
-      const organizationId = getActiveOrganizationId(request, reply)
-      if (!organizationId) return
+      const organizationId = getActiveOrganizationId(request, reply);
+      if (!organizationId) return;
 
-      const allowed = await requireOrgPermission(request, reply, {
-        client: ["read"],
-      }, organizationId)
-      if (!allowed) return
+      const allowed = await requireOrgPermission(
+        request,
+        reply,
+        {
+          client: ["read"],
+        },
+        organizationId
+      );
+      if (!allowed) return;
 
-      const params = paramsSchema.parse(request.params)
+      const params = paramsSchema.parse(request.params);
       const client = await fastify.prisma.client.findFirst({
         where: { id: params.clientId, organizationId },
-      })
+        include: { organization: true },
+      });
 
       if (!client) {
-        reply.code(404).send({ error: "CLIENT_NOT_FOUND" })
-        return
+        reply.code(404).send({ error: "CLIENT_NOT_FOUND" });
+        return;
       }
 
-      return { client }
+      return client;
     }
-  )
+  );
 
   fastify.patch(
     "/clients/:clientId",
     { preHandler: fastify.authGuard },
     async (request, reply) => {
-      const organizationId = getActiveOrganizationId(request, reply)
-      if (!organizationId) return
+      const organizationId = getActiveOrganizationId(request, reply);
+      if (!organizationId) return;
 
-      const allowed = await requireOrgPermission(request, reply, {
-        client: ["update"],
-      }, organizationId)
-      if (!allowed) return
+      const allowed = await requireOrgPermission(
+        request,
+        reply,
+        {
+          client: ["update"],
+        },
+        organizationId
+      );
+      if (!allowed) return;
 
-      const params = paramsSchema.parse(request.params)
-      const body = clientUpdateSchema.parse(request.body)
+      const params = paramsSchema.parse(request.params);
+      const body = clientUpdateSchema.parse(request.body);
 
       const existing = await fastify.prisma.client.findFirst({
         where: { id: params.clientId, organizationId },
-      })
+      });
 
       if (!existing) {
-        reply.code(404).send({ error: "CLIENT_NOT_FOUND" })
-        return
+        reply.code(404).send({ error: "CLIENT_NOT_FOUND" });
+        return;
       }
 
       const client = await fastify.prisma.client.update({
@@ -136,42 +164,47 @@ const clients: FastifyPluginAsync = async (fastify) => {
           ...body,
           currency: body.currency?.toUpperCase(),
         },
-      })
+      });
 
-      return { client }
+      return client;
     }
-  )
+  );
 
   fastify.delete(
     "/clients/:clientId",
     { preHandler: fastify.authGuard },
     async (request, reply) => {
-      const organizationId = getActiveOrganizationId(request, reply)
-      if (!organizationId) return
+      const organizationId = getActiveOrganizationId(request, reply);
+      if (!organizationId) return;
 
-      const allowed = await requireOrgPermission(request, reply, {
-        client: ["archive"],
-      }, organizationId)
-      if (!allowed) return
+      const allowed = await requireOrgPermission(
+        request,
+        reply,
+        {
+          client: ["archive"],
+        },
+        organizationId
+      );
+      if (!allowed) return;
 
-      const params = paramsSchema.parse(request.params)
+      const params = paramsSchema.parse(request.params);
       const existing = await fastify.prisma.client.findFirst({
         where: { id: params.clientId, organizationId },
-      })
+      });
 
       if (!existing) {
-        reply.code(404).send({ error: "CLIENT_NOT_FOUND" })
-        return
+        reply.code(404).send({ error: "CLIENT_NOT_FOUND" });
+        return;
       }
 
       const client = await fastify.prisma.client.update({
         where: { id: params.clientId },
         data: { status: "archived" },
-      })
+      });
 
-      return { client }
+      return client;
     }
-  )
-}
+  );
+};
 
-export default clients
+export default clients;

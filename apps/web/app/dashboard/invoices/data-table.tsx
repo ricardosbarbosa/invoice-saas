@@ -8,11 +8,13 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  OnChangeFn,
   PaginationState,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { Button } from "@workspace/ui/components/button";
 import { DataTableViewOptions } from "@workspace/ui/components/data-table/data-table-colum-toggle";
 import { DataTablePagination } from "@workspace/ui/components/data-table/data-table-pagination";
 
@@ -26,6 +28,8 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table";
+import { PlusIcon } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
@@ -53,32 +57,38 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
-      
     state: {
-      pagination,
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
 
   return (
     <div className="space-y-4 ">
-      <div className="flex items-center py-4">
-      <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+      <div className="flex items-center py-4 gap-4">
+        <Input
+          placeholder="Filter by number..."
+          value={(table.getColumn("number")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
+            table.getColumn("number")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
+        <div className="flex-1" />
+        <Button variant="default" size="sm" asChild>
+          <Link href="/dashboard/invoices/new">
+            <PlusIcon className="h-4 w-4" />
+            Add Invoice
+          </Link>
+        </Button>
         <DataTableViewOptions table={table} />
       </div>
       <div className="overflow-x-auto rounded-md border">
