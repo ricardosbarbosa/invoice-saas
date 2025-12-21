@@ -14,17 +14,16 @@ import { authClient } from "@/lib/auth-client";
 import { SessionWithImpersonatedBy } from "better-auth/plugins";
 import { DataTable } from "./data-table";
 import { useParams } from "next/navigation";
-import { toast } from "sonner";
+import { toast } from "@workspace/ui/components/sonner";
 
 export default function UsersPage() {
-
   const userId = useParams<{ userId: string }>().userId;
   const [sessions, setSessions] = useState<SessionWithImpersonatedBy[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       const response = await authClient.admin.listUserSessions({
-        userId
+        userId,
       });
       if (response.error) {
         toast.error(response.error.message);
@@ -54,10 +53,7 @@ export default function UsersPage() {
             <CardDescription>Manage user {userId} sessions.</CardDescription>
           </CardHeader>
           <CardContent>
-            <DataTable
-              columns={columns}
-              data={sessions}
-            />
+            <DataTable columns={columns} data={sessions} />
           </CardContent>
         </Card>
       </div>

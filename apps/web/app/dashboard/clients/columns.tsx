@@ -27,7 +27,14 @@ import { ActionButton } from "@workspace/ui/components/action-button";
 
 export type ClientWithOrganization = Prisma.ClientGetPayload<{
   include: { organization: true };
-}>;
+}> & {
+  subtotal: string;
+  discountTotal: string;
+  taxTotal: string;
+  shippingTotal: string;
+  shippingTax: string;
+  total: string;
+};
 
 export const columns: ({
   deleteClient,

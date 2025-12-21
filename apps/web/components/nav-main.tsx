@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react"
-import { usePathname } from "next/navigation"
+import { ChevronRight, type LucideIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@workspace/ui/components/collapsible"
+} from "@workspace/ui/components/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -17,68 +17,68 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@workspace/ui/components/sidebar"
+} from "@workspace/ui/components/sidebar";
 
 export function NavMain({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon?: LucideIcon
+    title: string;
+    url: string;
+    icon?: LucideIcon;
     items?: {
-      title: string
-      url: string
-    }[]
-  }[]
+      title: string;
+      url: string;
+    }[];
+  }[];
 }) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const normalizePath = (path: string) => {
     if (path.length <= 1) {
-      return path
+      return path;
     }
 
-    return path.replace(/\/+$/, "")
-  }
+    return path.replace(/\/+$/, "");
+  };
 
   const isActivePath = (href: string) => {
     if (!href || href === "#") {
-      return false
+      return false;
     }
 
-    const normalizedHref = normalizePath(href)
-    const normalizedPathname = normalizePath(pathname)
+    const normalizedHref = normalizePath(href);
+    const normalizedPathname = normalizePath(pathname);
 
     if (normalizedHref === "/") {
-      return normalizedPathname === "/"
+      return normalizedPathname === "/";
     }
 
     return (
       normalizedPathname === normalizedHref ||
       normalizedPathname.startsWith(`${normalizedHref}/`)
-    )
-  }
+    );
+  };
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          const hasActiveChild =
-            item.items?.some((subItem) => isActivePath(subItem.url)) ?? false
-          const isItemActive = isActivePath(item.url) || hasActiveChild
+          // const hasActiveChild =
+          //   item.items?.some((subItem) => isActivePath(subItem.url)) ?? false
+          // const isItemActive = isActivePath(item.url) || hasActiveChild
 
           return (
             <Collapsible
               key={item.title}
               asChild
-              defaultOpen={isItemActive}
+              defaultOpen
               className="group/collapsible"
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title} >
+                  <SidebarMenuButton tooltip={item.title}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -87,7 +87,7 @@ export function NavMain({
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     {item.items?.map((subItem) => {
-                      const isSubItemActive = isActivePath(subItem.url)
+                      const isSubItemActive = isActivePath(subItem.url);
 
                       return (
                         <SidebarMenuSubItem key={subItem.title}>
@@ -100,15 +100,15 @@ export function NavMain({
                             </a>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
-                      )
+                      );
                     })}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible>
-          )
+          );
         })}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

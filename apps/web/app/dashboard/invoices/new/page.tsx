@@ -1,26 +1,26 @@
-import Link from "next/link"
+import Link from "next/link";
 
-import { InvoiceForm } from "@/components/invoice-form"
-import { Button } from "@workspace/ui/components/button"
+import { InvoiceForm } from "@/components/invoice-form";
+import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card"
-import { Separator } from "@workspace/ui/components/separator"
-import { SidebarTrigger } from "@workspace/ui/components/sidebar"
+} from "@workspace/ui/components/card";
+import { Separator } from "@workspace/ui/components/separator";
+import { SidebarTrigger } from "@workspace/ui/components/sidebar";
 
 type PageProps = {
-  searchParams?: Promise<{ clientId?: string | string[] }>
-}
+  searchParams?: Promise<{ clientId?: string | string[] }>;
+};
 
 export default async function Page({ searchParams }: PageProps) {
-  const clientIdParam = (await searchParams)?.clientId
+  const clientIdParam = (await searchParams)?.clientId;
   const clientId = Array.isArray(clientIdParam)
     ? clientIdParam[0]
-    : clientIdParam
+    : clientIdParam;
 
   return (
     <>
@@ -40,18 +40,8 @@ export default async function Page({ searchParams }: PageProps) {
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <Card>
-          <CardHeader>
-            <CardTitle>Invoice details</CardTitle>
-            <CardDescription>
-              Define pricing, taxes, discounts, and shipping before sending.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <InvoiceForm initialValues={{ clientId: clientId ?? "" }} />
-          </CardContent>
-        </Card>
+        <InvoiceForm initialValues={{ clientId: clientId ?? "" }} />
       </div>
     </>
-  )
+  );
 }

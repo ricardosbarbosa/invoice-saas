@@ -1,15 +1,23 @@
-import { ClientWithOrganization } from "@/app/dashboard/clients/columns";
 import { invoicesApi } from "./api";
 import { Prisma } from "@workspace/db";
 
-export type InvoiceWithClient = Prisma.InvoiceGetPayload<{
-  include: { client: true };
-}>;
+export type InvoiceTotals = {
+  subtotal: string;
+  discountTotal: string;
+  taxTotal: string;
+  shippingTotal: string;
+  shippingTax: string;
+  total: string;
+};
+
+export type InvoiceWithClientAndItems = Prisma.InvoiceGetPayload<{
+  include: { client: true; items: true };
+}> & { totals: InvoiceTotals };
 
 const invoiceApi = invoicesApi.injectEndpoints({
   endpoints: (build) => ({
     getInvoices: build.query<
-      { data: InvoiceWithClient[] },
+      { data: InvoiceWithClientAndItems[] },
       { clientId?: string }
     >({
       query: ({ clientId }) => ({
@@ -22,7 +30,10 @@ const invoiceApi = invoicesApi.injectEndpoints({
         params: { clientId },
       }),
     }),
-    getInvoiceById: build.query<InvoiceWithClient, { invoiceId: string }>({
+    getInvoiceById: build.query<
+      InvoiceWithClientAndItems,
+      { invoiceId: string }
+    >({
       query: ({ invoiceId }) => ({
         url: `/invoices/${invoiceId}`,
         method: "GET",
@@ -33,7 +44,7 @@ const invoiceApi = invoicesApi.injectEndpoints({
       }),
     }),
     createInvoice: build.mutation<
-      InvoiceWithClient,
+      InvoiceWithClientAndItems,
       { invoice: Omit<Prisma.InvoiceCreateManyInput, "organizationId"> }
     >({
       query: ({ invoice }) => ({
@@ -47,8 +58,8 @@ const invoiceApi = invoicesApi.injectEndpoints({
       }),
     }),
     updateInvoice: build.mutation<
-      InvoiceWithClient,
-      { invoiceId: string; invoice: Partial<InvoiceWithClient> }
+      InvoiceWithClientAndItems,
+      { invoiceId: string; invoice: Partial<InvoiceWithClientAndItems> }
     >({
       query: ({ invoiceId, invoice }) => ({
         url: `/invoices/${invoiceId}`,
