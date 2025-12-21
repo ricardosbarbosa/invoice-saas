@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { Button } from "@workspace/ui/components/button";
@@ -10,6 +11,8 @@ import {
 } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
+import { toast } from "@workspace/ui/components/sonner";
+import { env } from "@/env";
 import { useGetInvoiceByIdQuery } from "@/lib/store/invoices";
 import PageHeader from "@/components/page-header";
 
@@ -40,6 +43,7 @@ const formatRate = (value?: unknown) => {
 
 export default function Page() {
   const params = useParams();
+  const [isExporting, setIsExporting] = useState(false);
   const {
     data: invoice,
     isLoading,
@@ -47,6 +51,47 @@ export default function Page() {
   } = useGetInvoiceByIdQuery({
     invoiceId: params.invoiceId as string,
   });
+
+  const handleExportPdf = async () => {
+    if (!invoice || isExporting) return;
+
+    setIsExporting(true);
+    try {
+      const response = await fetch(
+        `${env.NEXT_PUBLIC_API_URL}/invoices/${invoice.id}/pdf`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            Accept: "application/pdf",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to export PDF (${response.status})`);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const safeNumber = invoice.number
+        .replace(/[^a-zA-Z0-9._-]+/g, "_")
+        .replace(/^_+|_+$/g, "");
+      const filename = safeNumber ? `${safeNumber}.pdf` : "invoice.pdf";
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (exportError) {
+      toast.error("Unable to export PDF. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -113,6 +158,14 @@ export default function Page() {
             </Button>
             <Button variant="outline" size="sm" asChild>
               <Link href={`/dashboard/invoices/${invoice.id}/edit`}>Edit</Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportPdf}
+              disabled={isExporting}
+            >
+              {isExporting ? "Preparing PDF..." : "Download PDF"}
             </Button>
           </div>
         }

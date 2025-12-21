@@ -5,6 +5,7 @@ import {
   getActiveOrganizationId,
   requireOrgPermission,
 } from "../lib/organization";
+import { renderInvoicePdf } from "../lib/invoice-pdf";
 import {
   computeInvoiceTotals,
   parseDecimal,
@@ -87,6 +88,13 @@ const paramsSchema = z.object({
 
 const normalizeDate = (value?: string) =>
   value ? new Date(value) : new Date();
+
+const sanitizeFilename = (value: string) => {
+  const cleaned = value
+    .replace(/[^a-zA-Z0-9._-]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return cleaned.length > 0 ? cleaned : "invoice";
+};
 
 const invoices: FastifyPluginAsync = async (fastify) => {
   fastify.get(
@@ -207,6 +215,55 @@ const invoices: FastifyPluginAsync = async (fastify) => {
           currency: created.currency,
         }),
       };
+    }
+  );
+
+  fastify.get(
+    "/invoices/:invoiceId/pdf",
+    { preHandler: fastify.authGuard },
+    async (request, reply) => {
+      const organizationId = getActiveOrganizationId(request, reply);
+      if (!organizationId) return;
+
+      const allowed = await requireOrgPermission(
+        request,
+        reply,
+        { invoice: ["read"] },
+        organizationId
+      );
+      if (!allowed) return;
+
+      const params = paramsSchema.parse(request.params);
+      const invoice = await fastify.prisma.invoice.findFirst({
+        where: { id: params.invoiceId, organizationId },
+        include: { items: true, client: true, organization: true },
+      });
+
+      if (!invoice) {
+        reply.code(404).send({ error: "INVOICE_NOT_FOUND" });
+        return;
+      }
+
+      const totals = computeInvoiceTotals({
+        items: invoice.items,
+        discountType: invoice.discountType,
+        discountValue: invoice.discountValue,
+        shippingAmount: invoice.shippingAmount,
+        shippingTaxRate: invoice.shippingTaxRate,
+        currency: invoice.currency,
+      });
+
+      const pdfBuffer = await renderInvoicePdf({ invoice, totals });
+      const safeFilename = sanitizeFilename(invoice.number);
+
+      reply
+        .header("Content-Type", "application/pdf")
+        .header(
+          "Content-Disposition",
+          `attachment; filename="${safeFilename}.pdf"`
+        )
+        .header("Cache-Control", "private, no-store, max-age=0")
+        .send(pdfBuffer);
     }
   );
 
