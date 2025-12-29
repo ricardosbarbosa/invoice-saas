@@ -31,6 +31,7 @@
     "@workspace/auth": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/env": "workspace:*",
+    "@workspace/types": "workspace:*",
     "dotenv": "^16.4.7",
     "fastify": "^5.0.0",
     "fastify-cli": "^7.4.1",

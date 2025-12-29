@@ -18,6 +18,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@workspace/auth": "workspace:*",
     "@workspace/env": "workspace:*",
+    "@workspace/types": "workspace:*",
     "@workspace/ui": "workspace:*",
     "better-auth": "^1.4.7",
     "lucide-react": "^0.475.0",
@@ -27,6 +28,7 @@
     "react-dom": "^19.2.1",
     "react-hook-form": "^7.68.0",
     "react-redux": "^9.2.0",
+    "ua-parser-js": "^2.0.7",
     "zod": "^3.25.76"
   },
   "devDependencies": {

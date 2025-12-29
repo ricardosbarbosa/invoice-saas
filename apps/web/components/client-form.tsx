@@ -3,6 +3,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { ClientFormValues } from "@workspace/types";
 
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -14,6 +15,7 @@ import {
 } from "@workspace/ui/components/field";
 import { Input } from "@workspace/ui/components/input";
 
+// Frontend-specific helper for form handling (using transform for better form UX)
 const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
   z
     .union([z.literal(""), schema])
@@ -22,6 +24,7 @@ const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
       value === "" || value === undefined ? undefined : value
     );
 
+// Frontend-specific client form schema (matches shared schema structure but uses transform)
 const clientFormSchema = z.object({
   name: z.string().min(1, "Client name is required."),
   email: emptyToUndefined(z.string().email()),
@@ -37,7 +40,7 @@ const clientFormSchema = z.object({
   notes: emptyToUndefined(z.string()),
 });
 
-export type ClientFormValues = z.infer<typeof clientFormSchema>;
+export type { ClientFormValues };
 
 type ClientFormProps = {
   clientId?: string;

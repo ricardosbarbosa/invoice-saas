@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  invoiceBaseSchema,
+  invoiceItemSchema,
+} from "@workspace/types";
 
 import { authClient } from "@/lib/auth-client";
 import { env } from "@/env";
@@ -18,6 +22,7 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import { Separator } from "@workspace/ui/components/separator";
 
+// Frontend-specific helpers for form handling (using transform for better form UX)
 const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
   z
     .union([z.literal(""), schema])
@@ -36,13 +41,15 @@ const optionalString = emptyToUndefined(z.string());
 const optionalDate = emptyToUndefined(z.string());
 const optionalCurrency = emptyToUndefined(z.string().length(3));
 
-const invoiceItemSchema = z.object({
+// Frontend-specific invoice item schema with custom messages
+const invoiceItemFormSchema = z.object({
   description: z.string().min(1, "Description is required."),
   quantity: numericString,
   unitPrice: numericString,
   taxRate: optionalNumericString,
 });
 
+// Frontend-specific invoice form schema with custom messages
 const invoiceFormSchema = z
   .object({
     clientId: z.string().min(1, "Client is required."),
@@ -55,7 +62,7 @@ const invoiceFormSchema = z
     shippingTaxRate: optionalNumericString,
     notes: optionalString,
     terms: optionalString,
-    items: z.array(invoiceItemSchema).min(1, "Add at least one line item."),
+    items: z.array(invoiceItemFormSchema).min(1, "Add at least one line item."),
   })
   .superRefine((data, ctx) => {
     if (data.discountType && data.discountValue === undefined) {
@@ -82,6 +89,7 @@ type InvoiceFormProps = {
   initialValues?: Partial<InvoiceFormValues>;
 };
 
+// Client type for form usage (simplified from Prisma)
 type Client = {
   id: string;
   name: string;

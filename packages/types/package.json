@@ -1,18 +1,14 @@
 {
-  "name": "@workspace/auth",
+  "name": "@workspace/types",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./permissions": {
-      "types": "./dist/permissions.d.ts",
-      "default": "./dist/permissions.js"
     }
   },
   "scripts": {
@@ -20,10 +16,12 @@
     "dev": "tsc -w --preserveWatchOutput -p tsconfig.json",
     "lint": "eslint ."
   },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
-    "@better-auth/passkey": "^1.4.7",
     "@workspace/db": "workspace:*",
-    "better-auth": "^1.4.7"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20.19.25",
@@ -33,3 +31,4 @@
     "typescript": "^5.9.3"
   }
 }
+

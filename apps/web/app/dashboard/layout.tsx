@@ -1,19 +1,19 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import { getServerSession } from "@/lib/server-session"
+import { AppSidebar } from "@/components/app-sidebar";
+import { getServerSession } from "@/lib/server-session";
 import {
   SidebarInset,
   SidebarProvider,
-} from "@workspace/ui/components/sidebar"
-import { redirect } from "next/navigation"
+} from "@workspace/ui/components/sidebar";
+import { redirect } from "next/navigation";
 
 export default async function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const session = await getServerSession()
+  const session = await getServerSession();
   if (!session) {
-    redirect("/login")
+    redirect("/login");
   }
 
   return (
@@ -21,5 +21,5 @@ export default async function DashboardLayout({
       <AppSidebar />
       <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

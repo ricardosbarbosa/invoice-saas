@@ -1,6 +1,7 @@
 import { Separator } from "@workspace/ui/components/separator";
 import { SidebarTrigger } from "@workspace/ui/components/sidebar";
 import React from "react";
+import { ModeToggle } from "./mode-toggle";
 
 export default function PageHeader({
   title,
@@ -19,7 +20,10 @@ export default function PageHeader({
         />
         <h1 className="text-lg font-semibold">{title}</h1>
       </div>
-      <div className="ml-auto px-4">{actions}</div>
+      <div className="ml-auto px-4">
+        {actions}
+        <ModeToggle enableSystem={false} />
+      </div>
     </header>
   );
 }

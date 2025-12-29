@@ -1,5 +1,5 @@
-import { createEnv } from "@t3-oss/env-nextjs"
-import { urlSchema } from "@workspace/env"
+import { createEnv } from "@t3-oss/env-nextjs";
+import { urlSchema } from "@workspace/env";
 
 export const env = createEnv({
   server: {},
@@ -10,6 +10,4 @@ export const env = createEnv({
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
   emptyStringAsUndefined: true,
-})
-
-
+});

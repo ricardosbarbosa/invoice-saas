@@ -2,15 +2,7 @@ import Link from "next/link";
 
 import { InvoiceForm } from "@/components/invoice-form";
 import { Button } from "@workspace/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import { Separator } from "@workspace/ui/components/separator";
-import { SidebarTrigger } from "@workspace/ui/components/sidebar";
+import PageHeader from "@/components/page-header";
 
 type PageProps = {
   searchParams?: Promise<{ clientId?: string | string[] }>;
@@ -24,21 +16,14 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
-          <h1 className="text-lg font-semibold">New invoice</h1>
-        </div>
-        <div className="ml-auto px-4">
+      <PageHeader
+        title="New invoice"
+        actions={
           <Button variant="outline" asChild>
             <Link href="/dashboard/invoices">Back to invoices</Link>
           </Button>
-        </div>
-      </header>
+        }
+      />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <InvoiceForm initialValues={{ clientId: clientId ?? "" }} />
       </div>

@@ -1,8 +1,10 @@
 import { Decimal } from "@workspace/db"
 import type { Prisma } from "@workspace/db"
+import type { DecimalLike } from "@workspace/types"
 
-type DecimalLike = Prisma.Decimal | string | number
-
+/**
+ * Invoice item input type for calculations (uses Prisma Decimal).
+ */
 export type InvoiceItemInput = {
   quantity: Prisma.Decimal
   unitPrice: Prisma.Decimal

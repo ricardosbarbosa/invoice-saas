@@ -1,38 +1,10 @@
 import type { FastifyPluginAsync } from "fastify";
-import { z } from "zod";
+import { clientSchema, clientUpdateSchema } from "@workspace/types";
 import {
   getActiveOrganizationId,
   requireOrgPermission,
 } from "../lib/organization";
-
-const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
-  z.preprocess(
-    (value) => (value === "" ? undefined : value),
-    schema.optional()
-  );
-
-const optionalString = emptyToUndefined(z.string());
-const optionalEmail = emptyToUndefined(z.string().email());
-const optionalCurrency = emptyToUndefined(z.string().length(3));
-
-const clientSchema = z.object({
-  name: z.string().min(1),
-  email: optionalEmail,
-  phone: optionalString,
-  taxId: optionalString,
-  addressLine1: optionalString,
-  addressLine2: optionalString,
-  city: optionalString,
-  state: optionalString,
-  postalCode: optionalString,
-  country: optionalString,
-  currency: optionalCurrency,
-  notes: optionalString,
-});
-
-const clientUpdateSchema = clientSchema.partial().extend({
-  status: z.enum(["active", "archived"]).optional(),
-});
+import z from "zod";
 
 const paramsSchema = z.object({
   clientId: z.string().min(1),

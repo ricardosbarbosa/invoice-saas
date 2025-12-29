@@ -1,14 +1,20 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import { authClient } from "@/lib/auth-client"
-import { env } from "@/env"
-import { Button } from "@workspace/ui/components/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
+import { authClient } from "@/lib/auth-client";
+import { env } from "@/env";
+import { Button } from "@workspace/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
 import {
   Field,
   FieldContent,
@@ -16,16 +22,16 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@workspace/ui/components/field"
-import { Input } from "@workspace/ui/components/input"
-import { Separator } from "@workspace/ui/components/separator"
-import { SidebarTrigger } from "@workspace/ui/components/sidebar"
+} from "@workspace/ui/components/field";
+import { Input } from "@workspace/ui/components/input";
+import PageHeader from "@/components/page-header";
+import Link from "next/link";
 
 type InvoiceSettings = {
-  prefixTemplate: string
-  numberPadding: number
-  defaultCurrency: string
-}
+  prefixTemplate: string;
+  numberPadding: number;
+  defaultCurrency: string;
+};
 
 const invoiceSettingsSchema = z.object({
   prefixTemplate: z.string().min(1, "Prefix template is required."),
@@ -34,18 +40,18 @@ const invoiceSettingsSchema = z.object({
     .string()
     .length(3, "Use a 3-letter currency code.")
     .transform((value) => value.toUpperCase()),
-})
+});
 
-type InvoiceSettingsFormValues = z.infer<typeof invoiceSettingsSchema>
+type InvoiceSettingsFormValues = z.infer<typeof invoiceSettingsSchema>;
 
 const readClientError = (
   error: { message?: string; statusText?: string } | null | undefined,
   fallback: string
-) => error?.message || error?.statusText || fallback
+) => error?.message || error?.statusText || fallback;
 
 export default function Page() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [loadError, setLoadError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -60,56 +66,56 @@ export default function Page() {
       numberPadding: 4,
       defaultCurrency: "USD",
     },
-  })
+  });
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     const loadSettings = async () => {
-      setIsLoading(true)
-      setLoadError(null)
+      setIsLoading(true);
+      setLoadError(null);
 
       try {
         const response = await authClient.$fetch<{ settings: InvoiceSettings }>(
           `${env.NEXT_PUBLIC_API_URL}/invoice-settings`,
           { method: "GET" }
-        )
+        );
 
-        if (!isMounted) return
+        if (!isMounted) return;
 
         if (response.error) {
           setLoadError(
             readClientError(response.error, "Unable to load invoice settings.")
-          )
-          return
+          );
+          return;
         }
 
-        const settings = response.data?.settings
+        const settings = response.data?.settings;
         if (settings) {
           reset({
             prefixTemplate: settings.prefixTemplate,
             numberPadding: settings.numberPadding,
             defaultCurrency: settings.defaultCurrency,
-          })
+          });
         }
       } catch {
-        if (!isMounted) return
-        setLoadError("Unable to load invoice settings.")
+        if (!isMounted) return;
+        setLoadError("Unable to load invoice settings.");
       } finally {
-        if (!isMounted) return
-        setIsLoading(false)
+        if (!isMounted) return;
+        setIsLoading(false);
       }
-    }
+    };
 
-    void loadSettings()
+    void loadSettings();
 
     return () => {
-      isMounted = false
-    }
-  }, [reset])
+      isMounted = false;
+    };
+  }, [reset]);
 
   const onSubmit = async (values: InvoiceSettingsFormValues) => {
-    clearErrors("root")
+    clearErrors("root");
 
     try {
       const response = await authClient.$fetch<{ settings: InvoiceSettings }>(
@@ -118,7 +124,7 @@ export default function Page() {
           method: "PATCH",
           body: values,
         }
-      )
+      );
 
       if (response.error) {
         setError("root", {
@@ -126,37 +132,35 @@ export default function Page() {
             response.error,
             "Unable to update invoice settings."
           ),
-        })
-        return
+        });
+        return;
       }
 
-      const settings = response.data?.settings
+      const settings = response.data?.settings;
       if (settings) {
         reset({
           prefixTemplate: settings.prefixTemplate,
           numberPadding: settings.numberPadding,
           defaultCurrency: settings.defaultCurrency,
-        })
+        });
       }
     } catch {
       setError("root", {
         message: "Unable to update invoice settings.",
-      })
+      });
     }
-  }
+  };
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
-          <h1 className="text-lg font-semibold">Invoice settings</h1>
-        </div>
-      </header>
+      <PageHeader
+        title="Invoice settings"
+        actions={
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/invoices">Back to invoices</Link>
+          </Button>
+        }
+      />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <Card>
           <CardHeader>
@@ -172,7 +176,9 @@ export default function Page() {
               <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <FieldGroup>
                   <Field>
-                    <FieldLabel htmlFor="prefixTemplate">Prefix template</FieldLabel>
+                    <FieldLabel htmlFor="prefixTemplate">
+                      Prefix template
+                    </FieldLabel>
                     <FieldContent>
                       <Input
                         id="prefixTemplate"
@@ -183,14 +189,16 @@ export default function Page() {
                       />
                       <FieldError errors={[errors.prefixTemplate]} />
                       <FieldDescription>
-                        Use tokens like YYYY, YY, MM, or DD. Sequence resets when the
-                        prefix changes.
+                        Use tokens like YYYY, YY, MM, or DD. Sequence resets
+                        when the prefix changes.
                       </FieldDescription>
                     </FieldContent>
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="numberPadding">Number padding</FieldLabel>
+                    <FieldLabel htmlFor="numberPadding">
+                      Number padding
+                    </FieldLabel>
                     <FieldContent>
                       <Input
                         id="numberPadding"
@@ -209,7 +217,9 @@ export default function Page() {
                   </Field>
 
                   <Field>
-                    <FieldLabel htmlFor="defaultCurrency">Default currency</FieldLabel>
+                    <FieldLabel htmlFor="defaultCurrency">
+                      Default currency
+                    </FieldLabel>
                     <FieldContent>
                       <Input
                         id="defaultCurrency"
@@ -220,7 +230,8 @@ export default function Page() {
                       />
                       <FieldError errors={[errors.defaultCurrency]} />
                       <FieldDescription>
-                        Three-letter ISO currency code, used when clients do not specify one.
+                        Three-letter ISO currency code, used when clients do not
+                        specify one.
                       </FieldDescription>
                     </FieldContent>
                   </Field>
@@ -239,5 +250,5 @@ export default function Page() {
         </Card>
       </div>
     </>
-  )
+  );
 }

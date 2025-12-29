@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Building2, Check, ChevronsUpDown, Plus } from "lucide-react"
-import type { Organization } from "better-auth/plugins"
+import { Building2, Check, ChevronsUpDown, Plus } from "lucide-react";
+import type { Organization } from "better-auth/plugins";
 
 import {
   DropdownMenu,
@@ -11,13 +11,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@workspace/ui/components/dropdown-menu"
+} from "@workspace/ui/components/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@workspace/ui/components/sidebar"
+} from "@workspace/ui/components/sidebar";
 
 export function OrganizationSwitcher({
   organizations,
@@ -26,16 +26,17 @@ export function OrganizationSwitcher({
   onAddOrganization,
   isBusy,
 }: {
-  organizations: Organization[]
-  activeOrganizationId?: string | null
-  onSelectOrganization?: (organization: Organization) => void
-  onAddOrganization?: () => void
-  isBusy?: boolean
+  organizations: Organization[];
+  activeOrganizationId?: string | null;
+  onSelectOrganization?: (organization: Organization) => void;
+  onAddOrganization?: () => void;
+  isBusy?: boolean;
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
   const activeOrganization =
-    organizations.find((organization) => organization.id === activeOrganizationId) ??
-    organizations[0]
+    organizations.find(
+      (organization) => organization.id === activeOrganizationId
+    ) ?? organizations[0];
 
   const logoStyle = (logo?: string | null) =>
     logo
@@ -44,7 +45,7 @@ export function OrganizationSwitcher({
           backgroundPosition: "center",
           backgroundSize: "cover",
         }
-      : undefined
+      : undefined;
 
   if (!activeOrganization) {
     return (
@@ -67,7 +68,7 @@ export function OrganizationSwitcher({
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
-    )
+    );
   }
 
   return (
@@ -147,5 +148,5 @@ export function OrganizationSwitcher({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

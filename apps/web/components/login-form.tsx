@@ -1,35 +1,37 @@
-"use client"
-import { cn } from "@workspace/ui/lib/utils"
-import { Button } from "@workspace/ui/components/button"
+"use client";
+import { cn } from "@workspace/ui/lib/utils";
+import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card"
+} from "@workspace/ui/components/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@workspace/ui/components/field"
-import { Input } from "@workspace/ui/components/input"
-import { useState, useTransition } from "react"
-import { authClient } from "@/lib/auth-client"
-import { toast } from "@workspace/ui/components/sonner"
+} from "@workspace/ui/components/field";
+import { Input } from "@workspace/ui/components/input";
+import { useState, useTransition } from "react";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "@workspace/ui/components/sonner";
+import { useRouter } from "next/navigation";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  
-  const [isPendingAction, startTransition] = useTransition()
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [isPendingAction, startTransition] = useTransition();
 
   const handleLogin = (event: React.FormEvent) => {
-    event.preventDefault()
+    event.preventDefault();
 
     startTransition(async () => {
       try {
@@ -37,17 +39,17 @@ export function LoginForm({
           email,
           password,
           callbackURL: "/organizations/select",
-        })
+        });
 
         if (result?.error) {
-          toast.error(result.error.message ?? "Invalid email or password.")
+          toast.error(result.error.message ?? "Invalid email or password.");
         }
       } catch {
-        toast.error("Unable to sign in. Please try again.")
+        toast.error("Unable to sign in. Please try again.");
       }
-    })
-  }
-  
+    });
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -81,11 +83,43 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </Field>
               <Field>
-                <Button type="submit" disabled={isPendingAction}>Login</Button>
-                <Button variant="outline" type="button">
+                <Button type="submit" disabled={isPendingAction}>
+                  Login
+                </Button>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() =>
+                    authClient.signIn.social(
+                      {
+                        provider: "google",
+                        callbackURL: `${window.location.origin}/organizations/select`,
+                      },
+                      {
+                        onSuccess: () => {
+                          toast.success("Signed in with Google");
+                          router.push("/");
+                        },
+                        onError: (error) => {
+                          console.error(error);
+                          toast.error(
+                            error.error?.message ??
+                              "Unable to sign in with Google"
+                          );
+                        },
+                      }
+                    )
+                  }
+                >
                   Login with Google
                 </Button>
                 <FieldDescription className="text-center">
@@ -97,5 +131,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

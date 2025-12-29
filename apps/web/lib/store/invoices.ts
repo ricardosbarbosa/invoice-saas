@@ -1,18 +1,12 @@
 import { invoicesApi } from "./api";
-import { Prisma } from "@workspace/db";
+import type {
+  InvoiceTotals,
+  InvoiceWithClientAndItemsAndTotals,
+} from "@workspace/types";
 
-export type InvoiceTotals = {
-  subtotal: string;
-  discountTotal: string;
-  taxTotal: string;
-  shippingTotal: string;
-  shippingTax: string;
-  total: string;
-};
+export type { InvoiceTotals } from "@workspace/types";
 
-export type InvoiceWithClientAndItems = Prisma.InvoiceGetPayload<{
-  include: { client: true; items: true };
-}> & { totals: InvoiceTotals };
+export type InvoiceWithClientAndItems = InvoiceWithClientAndItemsAndTotals;
 
 const invoiceApi = invoicesApi.injectEndpoints({
   endpoints: (build) => ({

@@ -6,8 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
-import { Separator } from "@workspace/ui/components/separator";
-import { SidebarTrigger } from "@workspace/ui/components/sidebar";
 import React, { useEffect, useState } from "react";
 import { columns } from "./columns";
 import { authClient } from "@/lib/auth-client";
@@ -15,6 +13,7 @@ import { SessionWithImpersonatedBy } from "better-auth/plugins";
 import { DataTable } from "./data-table";
 import { useParams } from "next/navigation";
 import { toast } from "@workspace/ui/components/sonner";
+import PageHeader from "@/components/page-header";
 
 export default function UsersPage() {
   const userId = useParams<{ userId: string }>().userId;
@@ -36,16 +35,7 @@ export default function UsersPage() {
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
-          <h1 className="text-lg font-semibold">Users</h1>
-        </div>
-      </header>
+      <PageHeader title={`User ${userId} sessions`} />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <Card>
           <CardHeader>

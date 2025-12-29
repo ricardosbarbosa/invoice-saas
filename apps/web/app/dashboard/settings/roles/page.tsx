@@ -1,42 +1,47 @@
-import { apiFetch } from "@/lib/api"
+import { apiFetch } from "@/lib/api";
 import {
   InviteMemberForm,
   InvitationsTable,
   MembersTable,
   RolesTable,
-} from "@/components/organization/organization-management"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
-import { Separator } from "@workspace/ui/components/separator"
-import { SidebarTrigger } from "@workspace/ui/components/sidebar"
+} from "@/components/organization/organization-management";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+import PageHeader from "@/components/page-header";
 
 type Member = {
-  id: string
-  role: string
-  createdAt: string
+  id: string;
+  role: string;
+  createdAt: string;
   user: {
-    id: string
-    name?: string | null
-    email?: string | null
-  }
-}
+    id: string;
+    name?: string | null;
+    email?: string | null;
+  };
+};
 
 type Invitation = {
-  id: string
-  email: string
-  role: string
-  status: string
-  createdAt: string
-  expiresAt: string
-}
+  id: string;
+  email: string;
+  role: string;
+  status: string;
+  createdAt: string;
+  expiresAt: string;
+};
 
 type OrgRole = {
-  id: string
-  role: string
-  permission: Record<string, string[]>
-  createdAt: string
-}
+  id: string;
+  role: string;
+  permission: Record<string, string[]>;
+  createdAt: string;
+};
 
-const DEFAULT_ROLES = ["owner", "admin", "member"]
+const DEFAULT_ROLES = ["owner", "admin", "member"];
 
 export default async function Page() {
   const [membersResponse, invitationsResponse, rolesResponse] =
@@ -44,47 +49,35 @@ export default async function Page() {
       apiFetch("/api/auth/organization/list-members"),
       apiFetch("/api/auth/organization/list-invitations"),
       apiFetch("/api/auth/organization/list-roles"),
-    ])
+    ]);
 
   const membersReady =
-    membersResponse.status === "fulfilled" && membersResponse.value.ok
+    membersResponse.status === "fulfilled" && membersResponse.value.ok;
   const invitationsReady =
-    invitationsResponse.status === "fulfilled" && invitationsResponse.value.ok
+    invitationsResponse.status === "fulfilled" && invitationsResponse.value.ok;
   const rolesReady =
-    rolesResponse.status === "fulfilled" && rolesResponse.value.ok
+    rolesResponse.status === "fulfilled" && rolesResponse.value.ok;
 
   const members = membersReady
     ? (((await membersResponse.value.json()) as { members?: Member[] })
         .members ?? [])
-    : []
+    : [];
 
   const invitations = invitationsReady
     ? ((await invitationsResponse.value.json()) as Invitation[])
-    : []
+    : [];
 
   const roles = rolesReady
     ? ((await rolesResponse.value.json()) as OrgRole[])
-    : []
+    : [];
 
   const roleOptions = Array.from(
-    new Set([
-      ...DEFAULT_ROLES,
-      ...roles.map((role) => role.role),
-    ])
-  )
+    new Set([...DEFAULT_ROLES, ...roles.map((role) => role.role)])
+  );
 
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2">
-        <div className="flex items-center gap-2 px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
-          <h1 className="text-lg font-semibold">Members & roles</h1>
-        </div>
-      </header>
+      <PageHeader title="Members & roles" />
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <Card>
           <CardHeader>
@@ -107,10 +100,7 @@ export default async function Page() {
           </CardHeader>
           <CardContent>
             {membersReady ? (
-              <MembersTable
-                members={members}
-                roles={roleOptions}
-              />
+              <MembersTable members={members} roles={roleOptions} />
             ) : (
               <div className="text-muted-foreground text-sm">
                 Unable to load members for this organization.
@@ -174,5 +164,5 @@ export default async function Page() {
         </Card>
       </div>
     </>
-  )
+  );
 }

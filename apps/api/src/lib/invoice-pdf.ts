@@ -1,18 +1,8 @@
 import PDFDocument from "pdfkit"
-import type { Prisma } from "@workspace/db"
-
-type InvoiceTotals = {
-  subtotal: string
-  discountTotal: string
-  taxTotal: string
-  shippingTotal: string
-  shippingTax: string
-  total: string
-}
-
-type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
-  include: { items: true; client: true; organization: true }
-}>
+import type {
+  InvoiceTotals,
+  InvoiceWithRelations,
+} from "@workspace/types"
 
 const formatDate = (value?: Date | string | null) =>
   value ? new Date(value).toLocaleDateString("en-US") : "-"

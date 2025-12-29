@@ -1,6 +1,11 @@
 import type { FastifyPluginAsync } from "fastify";
-import { z } from "zod";
 import { Decimal } from "@workspace/db";
+import {
+  invoiceCreateSchema,
+  invoiceUpdateSchema,
+  type InvoiceCreateInput,
+  type InvoiceUpdateInput,
+} from "@workspace/types";
 import {
   getActiveOrganizationId,
   requireOrgPermission,
@@ -11,76 +16,7 @@ import {
   parseDecimal,
   reserveInvoiceNumber,
 } from "../lib/invoice-utils";
-
-const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
-  z.preprocess(
-    (value) => (value === "" ? undefined : value),
-    schema.optional()
-  );
-
-const decimalInput = z.union([z.string(), z.number()]);
-const optionalDecimalInput = emptyToUndefined(decimalInput);
-const optionalString = emptyToUndefined(z.string());
-const optionalDateString = emptyToUndefined(z.string().datetime());
-const optionalCurrency = emptyToUndefined(z.string().length(3));
-
-const invoiceItemSchema = z.object({
-  description: z.string().min(1),
-  quantity: decimalInput,
-  unitPrice: decimalInput,
-  taxRate: optionalDecimalInput,
-});
-
-const invoiceBaseSchema = z.object({
-  clientId: z.string().min(1),
-  issueDate: optionalDateString,
-  dueDate: optionalDateString,
-  currency: optionalCurrency,
-  discountType: z.enum(["percentage", "fixed"]).optional(),
-  discountValue: optionalDecimalInput,
-  shippingAmount: optionalDecimalInput,
-  shippingTaxRate: optionalDecimalInput,
-  notes: optionalString,
-  terms: optionalString,
-  items: z.array(invoiceItemSchema).min(1),
-});
-
-const discountRefine = (
-  data: { discountType?: "percentage" | "fixed"; discountValue?: unknown },
-  ctx: z.RefinementCtx
-) => {
-  const hasDiscountType = data.discountType !== undefined;
-  const hasDiscountValue = data.discountValue !== undefined;
-
-  if (hasDiscountType && !hasDiscountValue) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["discountValue"],
-      message: "Discount value is required when discount type is set.",
-    });
-  }
-
-  if (!hasDiscountType && hasDiscountValue) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["discountType"],
-      message: "Discount type is required when discount value is set.",
-    });
-  }
-};
-
-const invoiceCreateSchema = invoiceBaseSchema.superRefine(discountRefine);
-
-const invoiceUpdateSchema = invoiceBaseSchema
-  .omit({ clientId: true })
-  .partial()
-  .extend({
-    status: z.enum(["draft", "sent", "paid", "void"]).optional(),
-  })
-  .superRefine(discountRefine);
-
-type InvoiceCreateInput = z.infer<typeof invoiceCreateSchema>;
-type InvoiceUpdateInput = z.infer<typeof invoiceUpdateSchema>;
+import z from "zod";
 
 const paramsSchema = z.object({
   invoiceId: z.string().min(1),

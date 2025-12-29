@@ -1,15 +1,18 @@
-import { prisma } from "@workspace/db"
-import { betterAuth } from "better-auth"
-import { admin, organization } from "better-auth/plugins"
-import { prismaAdapter } from "better-auth/adapters/prisma"
-import { ac, adminRoles, organizationRoles } from "./permissions.js"
+import { prisma } from "@workspace/db";
+import { betterAuth } from "better-auth";
+import { admin, openAPI, organization } from "better-auth/plugins";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { ac, adminRoles, organizationRoles } from "./permissions.js";
+import { passkey } from "@better-auth/passkey";
 
 const trustedOrigins: string[] = (process.env.CORS_ORIGIN ?? "")
   .split(",")
   .map((origin: string) => origin.trim())
-  .filter(Boolean)
+  .filter(Boolean);
 
-export const auth = betterAuth({
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export const auth: ReturnType<typeof betterAuth> = betterAuth({
   appName: "Invoice SaaS",
   /**
    * Fastify base URL. Falls back to localhost when unset so
@@ -19,8 +22,21 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   emailAndPassword: { enabled: true },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
   trustedOrigins,
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
   plugins: [
+    openAPI(),
+    passkey(),
     admin({
       ac,
       roles: adminRoles,
@@ -35,11 +51,13 @@ export const auth = betterAuth({
       dynamicAccessControl: {
         enabled: true,
       },
-    })
-  ]
-})
+    }),
+  ],
+});
 
-type SessionPayload = NonNullable<Awaited<ReturnType<(typeof auth)["api"]["getSession"]>>>
-export type AuthContext = SessionPayload
-export type AuthSession = SessionPayload["session"]
-export type AuthUser = SessionPayload["user"]
+type SessionPayload = NonNullable<
+  Awaited<ReturnType<(typeof auth)["api"]["getSession"]>>
+>;
+export type AuthContext = SessionPayload;
+export type AuthSession = SessionPayload["session"];
+export type AuthUser = SessionPayload["user"];
