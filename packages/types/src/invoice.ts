@@ -1,12 +1,6 @@
 import { z } from "zod";
 import type { Prisma } from "@workspace/db";
-import {
-  decimalInput,
-  optionalDecimalInput,
-  optionalDateString,
-  optionalCurrency,
-  optionalString,
-} from "./common";
+import { decimalInput } from "./common";
 
 /**
  * Invoice totals calculation result.
@@ -37,7 +31,7 @@ export const invoiceItemSchema = z.object({
   description: z.string().min(1),
   quantity: decimalInput,
   unitPrice: decimalInput,
-  taxRate: optionalDecimalInput,
+  taxRate: decimalInput,
 });
 
 /**
@@ -45,15 +39,15 @@ export const invoiceItemSchema = z.object({
  */
 export const invoiceBaseSchema = z.object({
   clientId: z.string().min(1),
-  issueDate: optionalDateString,
-  dueDate: optionalDateString,
-  currency: optionalCurrency,
+  issueDate: z.string().datetime(),
+  dueDate: z.string().datetime(),
+  currency: z.string().length(3),
   discountType: z.enum(["percentage", "fixed"]).optional(),
-  discountValue: optionalDecimalInput,
-  shippingAmount: optionalDecimalInput,
-  shippingTaxRate: optionalDecimalInput,
-  notes: optionalString,
-  terms: optionalString,
+  discountValue: decimalInput,
+  shippingAmount: decimalInput,
+  shippingTaxRate: decimalInput,
+  notes: z.string(),
+  terms: z.string(),
   items: z.array(invoiceItemSchema).min(1),
 });
 
@@ -87,7 +81,8 @@ const discountRefine = (
 /**
  * Invoice create schema (includes clientId and applies discount validation).
  */
-export const invoiceCreateSchema = invoiceBaseSchema.superRefine(discountRefine);
+export const invoiceCreateSchema =
+  invoiceBaseSchema.superRefine(discountRefine);
 
 /**
  * Invoice update schema (clientId omitted, status optional, applies discount validation).
@@ -130,4 +125,3 @@ export type InvoiceWithRelations = Prisma.InvoiceGetPayload<{
 export type InvoiceWithClientAndItemsAndTotals = InvoiceWithClientAndItems & {
   totals: InvoiceTotals;
 };
-

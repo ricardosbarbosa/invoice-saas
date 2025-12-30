@@ -37,18 +37,8 @@ export default function Page() {
           </Button>
         }
       />
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <Card>
-          <CardHeader>
-            <CardTitle>Client details</CardTitle>
-            <CardDescription>
-              Capture billing and contact information for invoicing.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ClientForm onSubmit={onSubmit} />
-          </CardContent>
-        </Card>
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 container mx-auto ">
+        <ClientForm onSubmit={onSubmit} />
       </div>
     </>
   );

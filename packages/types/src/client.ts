@@ -1,10 +1,5 @@
-import { z } from "zod";
+import z from "zod";
 import type { Prisma } from "@workspace/db";
-import {
-  optionalString,
-  optionalEmail,
-  optionalCurrency,
-} from "./common";
 
 /**
  * Client status enum values.
@@ -16,17 +11,19 @@ export type ClientStatus = "active" | "archived";
  */
 export const clientSchema = z.object({
   name: z.string().min(1),
-  email: optionalEmail,
-  phone: optionalString,
-  taxId: optionalString,
-  addressLine1: optionalString,
-  addressLine2: optionalString,
-  city: optionalString,
-  state: optionalString,
-  postalCode: optionalString,
-  country: optionalString,
-  currency: optionalCurrency,
-  notes: optionalString,
+  email: z
+    .union([z.email({ error: "Invalid email address" }), z.literal("")])
+    .optional(),
+  phone: z.string(),
+  taxId: z.string(),
+  addressLine1: z.string(),
+  addressLine2: z.string(),
+  city: z.string(),
+  state: z.string(),
+  postalCode: z.string(),
+  country: z.string(),
+  currency: z.string().length(3).optional(),
+  notes: z.string(),
 });
 
 /**
@@ -57,4 +54,3 @@ export type ClientFormValues = z.infer<typeof clientSchema>;
 export type ClientWithOrganization = Prisma.ClientGetPayload<{
   include: { organization: true };
 }>;
-

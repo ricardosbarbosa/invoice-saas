@@ -12,10 +12,14 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
 } from "@workspace/ui/components/sidebar";
 import type { Organization } from "better-auth/plugins";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 // This is sample data.
 const data = {
@@ -117,14 +121,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <div className="flex h-16 items-center border-b px-2">
-          <div className="flex items-center gap-2 font-semibold text-xl tracking-tight text-primary">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <FileText className="h-5 w-5" />
-            </div>
-            Invoicify
-          </div>
-        </div>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
+              <Link href="/dashboard">
+                <FileText className="!size-5" />
+                <span className="text-base font-semibold">Invoicify</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <OrganizationSwitcher
           organizations={orgs}
           activeOrganizationId={activeOrganization?.id}
