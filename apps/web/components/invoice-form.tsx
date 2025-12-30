@@ -5,10 +5,7 @@ import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  invoiceBaseSchema,
-  invoiceItemSchema,
-} from "@workspace/types";
+import { invoiceBaseSchema, invoiceItemSchema } from "@workspace/types";
 
 import { authClient } from "@/lib/auth-client";
 import { env } from "@/env";
@@ -374,7 +371,7 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
   return (
     <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
       <div
-        className="space-y-8 rounded-xl border p-6 shadow-sm max-w-6xl"
+        className="space-y-8 rounded-xl border p-6 shadow-sm"
         style={lightThemeStyle}
       >
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
