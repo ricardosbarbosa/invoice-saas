@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 import { authClient } from "@/lib/auth-client";
 import { env } from "@/env";
@@ -26,6 +25,7 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import PageHeader from "@/components/page-header";
 import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type InvoiceSettings = {
   prefixTemplate: string;
