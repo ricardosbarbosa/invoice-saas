@@ -11,7 +11,7 @@ export type ClientStatus = "active" | "archived";
  */
 export const clientSchema = z.object({
   name: z.string().min(1),
-  email: z.union([z.email(), z.literal("")]).optional(),
+  email: z.email(),
   phone: z.string(),
   taxId: z.string(),
   addressLine1: z.string(),
