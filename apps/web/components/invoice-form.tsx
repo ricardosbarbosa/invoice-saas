@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 import { authClient } from "@/lib/auth-client";
 import { env } from "@/env";
@@ -17,24 +16,12 @@ import {
 } from "@workspace/ui/components/field";
 import { Input } from "@workspace/ui/components/input";
 import { Separator } from "@workspace/ui/components/separator";
-
-// Frontend-specific helpers for form handling (using transform for better form UX)
-const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
-  z
-    .union([z.literal(""), schema])
-    .optional()
-    .transform((value) =>
-      value === "" || value === undefined ? undefined : value
-    );
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const numericString = z
   .string()
   .min(1, "Required")
   .refine((value) => !Number.isNaN(Number(value)), "Must be a number");
-
-const optionalString = emptyToUndefined(z.string());
-const optionalDate = emptyToUndefined(z.string());
-const optionalCurrency = emptyToUndefined(z.string().length(3));
 
 // Frontend-specific invoice item schema with custom messages
 const invoiceItemFormSchema = z.object({
@@ -46,10 +33,10 @@ const invoiceItemFormSchema = z.object({
 // Frontend-specific invoice form schema with custom messages
 const invoiceFormSchema = z.object({
   clientId: z.string().min(1, "Client is required."),
-  issueDate: optionalDate,
-  dueDate: optionalDate,
-  currency: optionalCurrency,
-  notes: optionalString,
+  issueDate: z.string().optional(),
+  dueDate: z.string().optional(),
+  currency: z.string().length(3).optional(),
+  notes: z.string().optional(),
   items: z.array(invoiceItemFormSchema).min(1, "Add at least one line item."),
 });
 
