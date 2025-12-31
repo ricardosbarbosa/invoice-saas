@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { InvoiceStatus, DiscountType } from "@workspace/types";
+import type { InvoiceStatus } from "@workspace/types";
 
 import { InvoiceForm } from "@/components/invoice-form";
 import { apiFetch } from "@/lib/api";
@@ -20,7 +20,6 @@ type InvoiceItem = {
   description: string;
   quantity: string;
   unitPrice: string;
-  taxRate?: string | null;
 };
 
 type Invoice = {
@@ -31,12 +30,7 @@ type Invoice = {
   issueDate: string;
   dueDate?: string | null;
   currency: string;
-  discountType?: DiscountType | null;
-  discountValue?: string | null;
-  shippingAmount?: string | null;
-  shippingTaxRate?: string | null;
   notes?: string | null;
-  terms?: string | null;
   items: InvoiceItem[];
 };
 
@@ -104,17 +98,11 @@ export default async function Page({ params }: PageProps) {
                 issueDate: invoice.issueDate,
                 dueDate: invoice.dueDate ?? "",
                 currency: invoice.currency,
-                discountType: invoice.discountType ?? "",
-                discountValue: invoice.discountValue ?? "",
-                shippingAmount: invoice.shippingAmount ?? "",
-                shippingTaxRate: invoice.shippingTaxRate ?? "",
                 notes: invoice.notes ?? "",
-                terms: invoice.terms ?? "",
                 items: invoice.items.map((item) => ({
                   description: item.description,
                   quantity: item.quantity,
                   unitPrice: item.unitPrice,
-                  taxRate: item.taxRate ?? "",
                 })),
               }}
             />

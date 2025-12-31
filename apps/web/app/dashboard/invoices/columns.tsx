@@ -93,39 +93,9 @@ export const columns: ({
     ),
   },
   {
-    accessorKey: "discountType",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Discount Type" />
-    ),
-  },
-  {
-    accessorKey: "discountValue",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Discount Value" />
-    ),
-  },
-  {
-    accessorKey: "shippingAmount",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Shipping Amount" />
-    ),
-  },
-  {
-    accessorKey: "shippingTaxRate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Shipping Tax Rate" />
-    ),
-  },
-  {
     accessorKey: "notes",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Notes" />
-    ),
-  },
-  {
-    accessorKey: "terms",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Terms" />
     ),
   },
   // {

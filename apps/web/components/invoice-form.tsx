@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { invoiceBaseSchema, invoiceItemSchema } from "@workspace/types";
 
 import { authClient } from "@/lib/auth-client";
 import { env } from "@/env";
@@ -33,7 +32,6 @@ const numericString = z
   .min(1, "Required")
   .refine((value) => !Number.isNaN(Number(value)), "Must be a number");
 
-const optionalNumericString = emptyToUndefined(numericString);
 const optionalString = emptyToUndefined(z.string());
 const optionalDate = emptyToUndefined(z.string());
 const optionalCurrency = emptyToUndefined(z.string().length(3));
@@ -43,41 +41,17 @@ const invoiceItemFormSchema = z.object({
   description: z.string().min(1, "Description is required."),
   quantity: numericString,
   unitPrice: numericString,
-  taxRate: optionalNumericString,
 });
 
 // Frontend-specific invoice form schema with custom messages
-const invoiceFormSchema = z
-  .object({
-    clientId: z.string().min(1, "Client is required."),
-    issueDate: optionalDate,
-    dueDate: optionalDate,
-    currency: optionalCurrency,
-    discountType: emptyToUndefined(z.enum(["percentage", "fixed"])),
-    discountValue: optionalNumericString,
-    shippingAmount: optionalNumericString,
-    shippingTaxRate: optionalNumericString,
-    notes: optionalString,
-    terms: optionalString,
-    items: z.array(invoiceItemFormSchema).min(1, "Add at least one line item."),
-  })
-  .superRefine((data, ctx) => {
-    if (data.discountType && data.discountValue === undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["discountValue"],
-        message: "Discount value is required when discount type is set.",
-      });
-    }
-
-    if (!data.discountType && data.discountValue !== undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["discountType"],
-        message: "Discount type is required when discount value is set.",
-      });
-    }
-  });
+const invoiceFormSchema = z.object({
+  clientId: z.string().min(1, "Client is required."),
+  issueDate: optionalDate,
+  dueDate: optionalDate,
+  currency: optionalCurrency,
+  notes: optionalString,
+  items: z.array(invoiceItemFormSchema).min(1, "Add at least one line item."),
+});
 
 type InvoiceFormValues = z.infer<typeof invoiceFormSchema>;
 
@@ -99,7 +73,6 @@ type Client = {
   state?: string | null;
   postalCode?: string | null;
   country?: string | null;
-  currency?: string | null;
 };
 
 const toDateInput = (value?: string | null) =>
@@ -173,9 +146,8 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
               ? "1"
               : String(item.quantity),
           unitPrice: toStringOrEmpty(item.unitPrice),
-          taxRate: toStringOrEmpty(item.taxRate),
         }))
-      : [{ description: "", quantity: "1", unitPrice: "", taxRate: "" }];
+      : [{ description: "", quantity: "1", unitPrice: "" }];
 
   const {
     control,
@@ -183,7 +155,6 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-    setValue,
     watch,
   } = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceFormSchema),
@@ -192,12 +163,7 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
       issueDate: toDateInput(initialValues?.issueDate),
       dueDate: toDateInput(initialValues?.dueDate),
       currency: initialValues?.currency ?? "",
-      discountType: initialValues?.discountType ?? "",
-      discountValue: toStringOrEmpty(initialValues?.discountValue),
-      shippingAmount: toStringOrEmpty(initialValues?.shippingAmount),
-      shippingTaxRate: toStringOrEmpty(initialValues?.shippingTaxRate),
       notes: initialValues?.notes ?? "",
-      terms: initialValues?.terms ?? "",
       items: defaultItems,
     },
   });
@@ -255,30 +221,13 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
   const watchedClientId = watch("clientId");
   const watchedCurrency = watch("currency");
   const watchedItems = watch("items");
-  const watchedDiscountType = watch("discountType");
-  const watchedDiscountValue = watch("discountValue");
-  const watchedShippingAmount = watch("shippingAmount");
-  const watchedShippingTaxRate = watch("shippingTaxRate");
 
   const selectedClient = useMemo(
     () => clients.find((client) => client.id === watchedClientId) ?? null,
     [clients, watchedClientId]
   );
 
-  useEffect(() => {
-    if (!selectedClient?.currency) return;
-    if (!watchedCurrency) {
-      setValue("currency", selectedClient.currency.toUpperCase(), {
-        shouldValidate: true,
-      });
-    }
-  }, [selectedClient?.currency, setValue, watchedCurrency]);
-
-  const resolvedCurrency = (
-    watchedCurrency ||
-    selectedClient?.currency ||
-    "USD"
-  ).toUpperCase();
+  const resolvedCurrency = (watchedCurrency || "USD").toUpperCase();
 
   const formatCurrencyValue = (amount: number) => {
     if (!Number.isFinite(amount)) return "-";
@@ -296,28 +245,7 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
     return sum + parseNumber(item.quantity) * parseNumber(item.unitPrice);
   }, 0);
 
-  let discountTotal = 0;
-  const discountValue = parseNumber(watchedDiscountValue);
-  if (watchedDiscountType === "percentage") {
-    discountTotal = subtotal * (discountValue / 100);
-  } else if (watchedDiscountType === "fixed") {
-    discountTotal = discountValue;
-  }
-  if (discountTotal > subtotal) discountTotal = subtotal;
-
-  const discountRatio = subtotal === 0 ? 0 : discountTotal / subtotal;
-
-  const lineTaxTotal = (watchedItems ?? []).reduce((sum, item) => {
-    const lineSubtotal =
-      parseNumber(item.quantity) * parseNumber(item.unitPrice);
-    const discountedLine = lineSubtotal - lineSubtotal * discountRatio;
-    return sum + discountedLine * parseNumber(item.taxRate);
-  }, 0);
-
-  const shippingAmount = parseNumber(watchedShippingAmount);
-  const shippingTax = shippingAmount * parseNumber(watchedShippingTaxRate);
-  const totalTax = lineTaxTotal + shippingTax;
-  const total = subtotal - discountTotal + totalTax + shippingAmount;
+  const total = subtotal;
 
   const onSubmit = async (values: InvoiceFormValues) => {
     const { clientId, ...payloadBase } = values;
@@ -383,19 +311,6 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
               <h2 className="text-2xl font-semibold">Invoice</h2>
               <span className="text-sm ">Number assigned on save</span>
             </div>
-            <Field>
-              <FieldLabel htmlFor="terms">Description</FieldLabel>
-              <FieldContent>
-                <textarea
-                  id="terms"
-                  className={textareaClassName}
-                  placeholder="Add description..."
-                  {...register("terms")}
-                  aria-invalid={!!errors.terms}
-                />
-                <FieldError errors={[errors.terms]} />
-              </FieldContent>
-            </Field>
           </div>
           <div className="w-full max-w-xs space-y-4">
             <div className="rounded-lg border  p-4 text-sm">
@@ -527,11 +442,10 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
             <div className="text-xs font-semibold uppercase ">Line items</div>
           </div>
 
-          <div className="grid gap-2 text-xs font-semibold uppercase  md:grid-cols-[2fr_0.8fr_1fr_0.8fr_0.8fr_auto]">
+          <div className="grid gap-2 text-xs font-semibold uppercase  md:grid-cols-[2fr_0.8fr_1fr_0.8fr_auto]">
             <div>Description</div>
             <div>Qty</div>
             <div>Rate</div>
-            <div>Tax</div>
             <div className="text-right">Amount</div>
             <div className="text-right">Actions</div>
           </div>
@@ -545,7 +459,7 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
               return (
                 <div
                   key={field.id}
-                  className="grid gap-3 rounded-lg border p-3 md:grid-cols-[2fr_0.8fr_1fr_0.8fr_0.8fr_auto]"
+                  className="grid gap-3 rounded-lg border p-3 md:grid-cols-[2fr_0.8fr_1fr_0.8fr_auto]"
                 >
                   <div>
                     <textarea
@@ -571,14 +485,6 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
                       aria-invalid={!!errors.items?.[index]?.unitPrice}
                     />
                     <FieldError errors={[errors.items?.[index]?.unitPrice]} />
-                  </div>
-                  <div>
-                    <Input
-                      placeholder="0.00"
-                      {...register(`items.${index}.taxRate`)}
-                      aria-invalid={!!errors.items?.[index]?.taxRate}
-                    />
-                    <FieldError errors={[errors.items?.[index]?.taxRate]} />
                   </div>
                   <div className="flex items-center justify-end text-sm font-medium">
                     {formatCurrencyValue(lineSubtotal)}
@@ -608,7 +514,6 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
                 description: "",
                 quantity: "1",
                 unitPrice: "",
-                taxRate: "",
               })
             }
           >
@@ -643,85 +548,6 @@ export function InvoiceForm({ invoiceId, initialValues }: InvoiceFormProps) {
               </span>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-2">
-              <Field>
-                <FieldLabel htmlFor="discountType">Discount type</FieldLabel>
-                <FieldContent>
-                  <select
-                    id="discountType"
-                    className={selectClassName}
-                    {...register("discountType")}
-                    aria-invalid={!!errors.discountType}
-                  >
-                    <option value="">None</option>
-                    <option value="percentage">Percentage</option>
-                    <option value="fixed">Fixed amount</option>
-                  </select>
-                  <FieldError errors={[errors.discountType]} />
-                </FieldContent>
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="discountValue">Discount value</FieldLabel>
-                <FieldContent>
-                  <Input
-                    id="discountValue"
-                    {...register("discountValue")}
-                    aria-invalid={!!errors.discountValue}
-                  />
-                  <FieldError errors={[errors.discountValue]} />
-                </FieldContent>
-              </Field>
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-2">
-              <Field>
-                <FieldLabel htmlFor="shippingAmount">
-                  Shipping amount
-                </FieldLabel>
-                <FieldContent>
-                  <Input
-                    id="shippingAmount"
-                    {...register("shippingAmount")}
-                    aria-invalid={!!errors.shippingAmount}
-                  />
-                  <FieldError errors={[errors.shippingAmount]} />
-                </FieldContent>
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="shippingTaxRate">
-                  Shipping tax rate
-                </FieldLabel>
-                <FieldContent>
-                  <Input
-                    id="shippingTaxRate"
-                    {...register("shippingTaxRate")}
-                    aria-invalid={!!errors.shippingTaxRate}
-                  />
-                  <FieldError errors={[errors.shippingTaxRate]} />
-                </FieldContent>
-              </Field>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <span className="">Discount</span>
-              <span className="font-medium">
-                -{formatCurrencyValue(discountTotal)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="">Tax</span>
-              <span className="font-medium">
-                {formatCurrencyValue(totalTax)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="">Shipping</span>
-              <span className="font-medium">
-                {formatCurrencyValue(shippingAmount)}
-              </span>
-            </div>
             <Separator />
             <div className="flex items-center justify-between text-base font-semibold">
               <span>Total</span>

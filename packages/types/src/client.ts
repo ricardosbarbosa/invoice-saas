@@ -22,7 +22,6 @@ export const clientSchema = z.object({
   state: z.string(),
   postalCode: z.string(),
   country: z.string(),
-  currency: z.string().length(3).optional(),
   notes: z.string(),
 });
 

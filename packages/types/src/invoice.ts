@@ -7,10 +7,6 @@ import { decimalInput } from "./common";
  */
 export type InvoiceTotals = {
   subtotal: string;
-  discountTotal: string;
-  taxTotal: string;
-  shippingTotal: string;
-  shippingTax: string;
   total: string;
 };
 
@@ -20,18 +16,12 @@ export type InvoiceTotals = {
 export type InvoiceStatus = "draft" | "sent" | "paid" | "void";
 
 /**
- * Discount type enum values.
- */
-export type DiscountType = "percentage" | "fixed";
-
-/**
  * Zod schema for invoice item.
  */
 export const invoiceItemSchema = z.object({
   description: z.string().min(1),
   quantity: decimalInput,
   unitPrice: decimalInput,
-  taxRate: decimalInput,
 });
 
 /**
@@ -42,58 +32,24 @@ export const invoiceBaseSchema = z.object({
   issueDate: z.string().datetime(),
   dueDate: z.string().datetime(),
   currency: z.string().length(3),
-  discountType: z.enum(["percentage", "fixed"]).optional(),
-  discountValue: decimalInput,
-  shippingAmount: decimalInput,
-  shippingTaxRate: decimalInput,
   notes: z.string(),
-  terms: z.string(),
   items: z.array(invoiceItemSchema).min(1),
 });
 
 /**
- * Discount validation refinement function.
+ * Invoice create schema (includes clientId).
  */
-const discountRefine = (
-  data: { discountType?: DiscountType; discountValue?: unknown },
-  ctx: z.RefinementCtx
-) => {
-  const hasDiscountType = data.discountType !== undefined;
-  const hasDiscountValue = data.discountValue !== undefined;
-
-  if (hasDiscountType && !hasDiscountValue) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["discountValue"],
-      message: "Discount value is required when discount type is set.",
-    });
-  }
-
-  if (!hasDiscountType && hasDiscountValue) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["discountType"],
-      message: "Discount type is required when discount value is set.",
-    });
-  }
-};
+export const invoiceCreateSchema = invoiceBaseSchema;
 
 /**
- * Invoice create schema (includes clientId and applies discount validation).
- */
-export const invoiceCreateSchema =
-  invoiceBaseSchema.superRefine(discountRefine);
-
-/**
- * Invoice update schema (clientId omitted, status optional, applies discount validation).
+ * Invoice update schema (clientId omitted, status optional).
  */
 export const invoiceUpdateSchema = invoiceBaseSchema
   .omit({ clientId: true })
   .partial()
   .extend({
     status: z.enum(["draft", "sent", "paid", "void"]).optional(),
-  })
-  .superRefine(discountRefine);
+  });
 
 /**
  * Type inferred from invoice create schema.

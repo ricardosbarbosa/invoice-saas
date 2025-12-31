@@ -145,18 +145,16 @@ export async function renderInvoicePdf({
   const descriptionWidth = 240
   const qtyWidth = 40
   const unitWidth = 80
-  const taxWidth = 50
   const totalWidth = Math.max(
     60,
-    pageWidth - descriptionWidth - qtyWidth - unitWidth - taxWidth
+    pageWidth - descriptionWidth - qtyWidth - unitWidth
   )
 
   const columns = {
     description: leftX,
     qty: leftX + descriptionWidth,
     unit: leftX + descriptionWidth + qtyWidth,
-    tax: leftX + descriptionWidth + qtyWidth + unitWidth,
-    total: leftX + descriptionWidth + qtyWidth + unitWidth + taxWidth,
+    total: leftX + descriptionWidth + qtyWidth + unitWidth,
   }
 
   const drawTableHeader = () => {
@@ -167,7 +165,6 @@ export async function renderInvoicePdf({
     })
     doc.text("Qty", columns.qty, y, { width: qtyWidth, align: "right" })
     doc.text("Unit", columns.unit, y, { width: unitWidth, align: "right" })
-    doc.text("Tax", columns.tax, y, { width: taxWidth, align: "right" })
     doc.text("Total", columns.total, y, {
       width: totalWidth,
       align: "right",
@@ -218,10 +215,6 @@ export async function renderInvoicePdf({
       width: unitWidth,
       align: "right",
     })
-    doc.text(formatRate(item.taxRate?.toString()), columns.tax, y, {
-      width: taxWidth,
-      align: "right",
-    })
     doc.text(formatCurrency(lineTotal.toString(), invoice.currency), columns.total, y, {
       width: totalWidth,
       align: "right",
@@ -234,10 +227,6 @@ export async function renderInvoicePdf({
 
   const totalsLines = [
     { label: "Subtotal", value: totals.subtotal },
-    { label: "Discount", value: totals.discountTotal },
-    { label: "Tax", value: totals.taxTotal },
-    { label: "Shipping", value: totals.shippingTotal },
-    { label: "Shipping tax", value: totals.shippingTax },
   ]
 
   const totalsBlockWidth = 200
@@ -277,14 +266,6 @@ export async function renderInvoicePdf({
     doc.fontSize(11).text("Notes", leftX, y)
     y = doc.y + 4
     doc.fontSize(10).text(invoice.notes, leftX, y, { width: pageWidth })
-    y = doc.y + 10
-  }
-
-  if (invoice.terms) {
-    ensureSpace(60)
-    doc.fontSize(11).text("Terms", leftX, y)
-    y = doc.y + 4
-    doc.fontSize(10).text(invoice.terms, leftX, y, { width: pageWidth })
   }
 
   doc.end()

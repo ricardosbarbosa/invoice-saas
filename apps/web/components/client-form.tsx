@@ -51,7 +51,6 @@ export function ClientForm({
       state: initialValues?.state ?? "",
       postalCode: initialValues?.postalCode ?? "",
       country: initialValues?.country ?? "",
-      currency: initialValues?.currency ?? "",
       notes: initialValues?.notes ?? "",
     },
   });
@@ -201,33 +200,6 @@ export function ClientForm({
                     aria-invalid={!!errors.country}
                   />
                   <FieldError errors={[errors.country]} />
-                </FieldContent>
-              </Field>
-            </div>
-          </CardContent>
-        </Card>
-      </FieldGroup>
-
-      <FieldGroup>
-        <Card>
-          <CardHeader>
-            <CardTitle>Default currency</CardTitle>
-            <CardDescription>
-              Used for invoices when no currency is specified.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-1 space-y-4 ">
-              <Field>
-                {/* <FieldLabel htmlFor="currency">Default currency</FieldLabel> */}
-                <FieldContent>
-                  <Input
-                    id="currency"
-                    placeholder="USD"
-                    {...register("currency")}
-                    aria-invalid={!!errors.currency}
-                  />
-                  <FieldError errors={[errors.currency]} />
                 </FieldContent>
               </Field>
             </div>

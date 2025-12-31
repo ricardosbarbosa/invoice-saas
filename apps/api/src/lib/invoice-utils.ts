@@ -8,7 +8,6 @@ import type { DecimalLike } from "@workspace/types"
 export type InvoiceItemInput = {
   quantity: Prisma.Decimal
   unitPrice: Prisma.Decimal
-  taxRate?: Prisma.Decimal | null
 }
 
 const ZERO_DECIMAL_CURRENCIES = new Set([
@@ -67,58 +66,19 @@ const roundToCurrency = (amount: Prisma.Decimal, currency: string) =>
 
 export const computeInvoiceTotals = ({
   items,
-  discountType,
-  discountValue,
-  shippingAmount,
-  shippingTaxRate,
   currency,
 }: {
   items: InvoiceItemInput[]
-  discountType?: "percentage" | "fixed" | null
-  discountValue?: Prisma.Decimal | null
-  shippingAmount?: Prisma.Decimal | null
-  shippingTaxRate?: Prisma.Decimal | null
   currency: string
 }) => {
   const subtotal = items.reduce((sum, item) => {
     return sum.plus(item.unitPrice.mul(item.quantity))
   }, toDecimal(0))
 
-  let discountTotal = toDecimal(0)
-  if (discountType && discountValue) {
-    if (discountType === "percentage") {
-      discountTotal = subtotal.mul(discountValue.div(100))
-    } else {
-      discountTotal = discountValue
-    }
-  }
-
-  if (discountTotal.greaterThan(subtotal)) {
-    discountTotal = subtotal
-  }
-
-  const discountRatio = subtotal.equals(0) ? toDecimal(0) : discountTotal.div(subtotal)
-
-  const lineTaxTotal = items.reduce((sum, item) => {
-    const lineSubtotal = item.unitPrice.mul(item.quantity)
-    const discountedLineSubtotal = lineSubtotal.minus(lineSubtotal.mul(discountRatio))
-    const taxRate = item.taxRate ?? toDecimal(0)
-    const lineTax = discountedLineSubtotal.mul(taxRate)
-    return sum.plus(lineTax)
-  }, toDecimal(0))
-
-  const shipping = shippingAmount ?? toDecimal(0)
-  const shippingTax = shipping.mul(shippingTaxRate ?? toDecimal(0))
-
-  const taxTotal = lineTaxTotal.plus(shippingTax)
-  const total = subtotal.minus(discountTotal).plus(taxTotal).plus(shipping)
+  const total = subtotal
 
   return {
     subtotal: roundToCurrency(subtotal, currency).toString(),
-    discountTotal: roundToCurrency(discountTotal, currency).toString(),
-    taxTotal: roundToCurrency(taxTotal, currency).toString(),
-    shippingTotal: roundToCurrency(shipping, currency).toString(),
-    shippingTax: roundToCurrency(shippingTax, currency).toString(),
     total: roundToCurrency(total, currency).toString(),
   }
 }

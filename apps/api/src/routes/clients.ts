@@ -60,7 +60,6 @@ const clients: FastifyPluginAsync = async (fastify) => {
         data: {
           organizationId,
           ...body,
-          currency: body.currency?.toUpperCase(),
         },
       });
 
@@ -134,7 +133,6 @@ const clients: FastifyPluginAsync = async (fastify) => {
         where: { id: params.clientId },
         data: {
           ...body,
-          currency: body.currency?.toUpperCase(),
         },
       });
 

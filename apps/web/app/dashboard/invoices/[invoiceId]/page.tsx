@@ -32,12 +32,6 @@ const formatCurrency = (
   }
 };
 
-const formatRate = (value?: unknown) => {
-  if (value === null || value === undefined || value === "") return "-";
-  const numeric = Number(String(value));
-  if (!Number.isFinite(numeric)) return "-";
-  return `${numeric * 100}%`;
-};
 
 export default function Page() {
   const params = useParams();
@@ -215,7 +209,6 @@ export default function Page() {
                         </th>
                         <th className="py-2 text-right font-medium">Qty</th>
                         <th className="py-2 text-right font-medium">Unit</th>
-                        <th className="py-2 text-right font-medium">Tax</th>
                         <th className="py-2 text-right font-medium">Total</th>
                       </tr>
                     </thead>
@@ -237,9 +230,6 @@ export default function Page() {
                               )}
                             </td>
                             <td className="py-3 text-right">
-                              {formatRate(item.taxRate?.toString())}
-                            </td>
-                            <td className="py-3 text-right">
                               {formatCurrency(
                                 lineTotal.toString(),
                                 invoice.currency
@@ -254,24 +244,13 @@ export default function Page() {
               </CardContent>
             </Card>
 
-            {(invoice.notes || invoice.terms) && (
+            {invoice.notes && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Notes & terms</CardTitle>
+                  <CardTitle>Notes</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3 text-sm">
-                  <div>
-                    <div className="text-muted-foreground text-xs uppercase">
-                      Notes
-                    </div>
-                    <div>{invoice.notes ?? "-"}</div>
-                  </div>
-                  <div>
-                    <div className="text-muted-foreground text-xs uppercase">
-                      Terms
-                    </div>
-                    <div>{invoice.terms ?? "-"}</div>
-                  </div>
+                <CardContent className="text-sm">
+                  <div>{invoice.notes}</div>
                 </CardContent>
               </Card>
             )}
@@ -285,39 +264,6 @@ export default function Page() {
                   <span className="text-muted-foreground">Subtotal</span>
                   <span>
                     {formatCurrency(invoice.totals.subtotal, invoice.currency)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Discount</span>
-                  <span>
-                    {formatCurrency(
-                      invoice.totals.discountTotal,
-                      invoice.currency
-                    )}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Tax</span>
-                  <span>
-                    {formatCurrency(invoice.totals.taxTotal, invoice.currency)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>
-                    {formatCurrency(
-                      invoice.totals.shippingTotal,
-                      invoice.currency
-                    )}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Shipping tax</span>
-                  <span>
-                    {formatCurrency(
-                      invoice.totals.shippingTax,
-                      invoice.currency
-                    )}
                   </span>
                 </div>
                 <div className="border-t pt-3 text-base font-semibold">

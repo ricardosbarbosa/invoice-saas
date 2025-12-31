@@ -128,12 +128,6 @@ export default function Page() {
             </div>
             <div>
               <div className="text-muted-foreground text-xs uppercase">
-                Currency
-              </div>
-              <div className="text-sm">{formatValue(client.currency)}</div>
-            </div>
-            <div>
-              <div className="text-muted-foreground text-xs uppercase">
                 Address
               </div>
               <div className="text-sm">{address || "-"}</div>

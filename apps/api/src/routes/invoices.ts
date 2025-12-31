@@ -59,10 +59,6 @@ const invoices: FastifyPluginAsync = async (fastify) => {
           ...invoice,
           totals: computeInvoiceTotals({
             items: invoice.items,
-            discountType: invoice.discountType,
-            discountValue: invoice.discountValue,
-            shippingAmount: invoice.shippingAmount,
-            shippingTaxRate: invoice.shippingTaxRate,
             currency: invoice.currency,
           }),
         })),
@@ -107,7 +103,6 @@ const invoices: FastifyPluginAsync = async (fastify) => {
 
         const currency = (
           body.currency ||
-          client.currency ||
           defaultCurrency
         ).toUpperCase();
 
@@ -120,18 +115,12 @@ const invoices: FastifyPluginAsync = async (fastify) => {
             issueDate,
             dueDate,
             currency,
-            discountType: body.discountType ?? null,
-            discountValue: parseDecimal(body.discountValue),
-            shippingAmount: parseDecimal(body.shippingAmount),
-            shippingTaxRate: parseDecimal(body.shippingTaxRate),
             notes: body.notes,
-            terms: body.terms,
             items: {
               create: body.items.map((item) => ({
                 description: item.description,
                 quantity: new Decimal(item.quantity),
                 unitPrice: new Decimal(item.unitPrice),
-                taxRate: parseDecimal(item.taxRate),
               })),
             },
           },
@@ -144,10 +133,6 @@ const invoices: FastifyPluginAsync = async (fastify) => {
         ...created,
         totals: computeInvoiceTotals({
           items: created.items,
-          discountType: created.discountType,
-          discountValue: created.discountValue,
-          shippingAmount: created.shippingAmount,
-          shippingTaxRate: created.shippingTaxRate,
           currency: created.currency,
         }),
       };
@@ -182,10 +167,6 @@ const invoices: FastifyPluginAsync = async (fastify) => {
 
       const totals = computeInvoiceTotals({
         items: invoice.items,
-        discountType: invoice.discountType,
-        discountValue: invoice.discountValue,
-        shippingAmount: invoice.shippingAmount,
-        shippingTaxRate: invoice.shippingTaxRate,
         currency: invoice.currency,
       });
 
@@ -233,10 +214,6 @@ const invoices: FastifyPluginAsync = async (fastify) => {
         ...invoice,
         totals: computeInvoiceTotals({
           items: invoice.items,
-          discountType: invoice.discountType,
-          discountValue: invoice.discountValue,
-          shippingAmount: invoice.shippingAmount,
-          shippingTaxRate: invoice.shippingTaxRate,
           currency: invoice.currency,
         }),
       };
@@ -314,28 +291,13 @@ const invoices: FastifyPluginAsync = async (fastify) => {
             issueDate,
             dueDate,
             currency: body.currency?.toUpperCase(),
-            discountType: body.discountType ?? existing.discountType,
-            discountValue:
-              body.discountValue === undefined
-                ? existing.discountValue
-                : parseDecimal(body.discountValue),
-            shippingAmount:
-              body.shippingAmount === undefined
-                ? existing.shippingAmount
-                : parseDecimal(body.shippingAmount),
-            shippingTaxRate:
-              body.shippingTaxRate === undefined
-                ? existing.shippingTaxRate
-                : parseDecimal(body.shippingTaxRate),
             notes: body.notes,
-            terms: body.terms,
             items: body.items
               ? {
                   create: body.items.map((item) => ({
                     description: item.description,
                     quantity: new Decimal(item.quantity),
                     unitPrice: new Decimal(item.unitPrice),
-                    taxRate: parseDecimal(item.taxRate),
                   })),
                 }
               : undefined,
@@ -348,10 +310,6 @@ const invoices: FastifyPluginAsync = async (fastify) => {
         ...updated,
         totals: computeInvoiceTotals({
           items: updated.items,
-          discountType: updated.discountType,
-          discountValue: updated.discountValue,
-          shippingAmount: updated.shippingAmount,
-          shippingTaxRate: updated.shippingTaxRate,
           currency: updated.currency,
         }),
       };

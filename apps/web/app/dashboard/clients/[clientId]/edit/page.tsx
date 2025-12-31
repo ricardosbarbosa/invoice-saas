@@ -123,7 +123,6 @@ export default function Page() {
                 state: client.state ?? "",
                 postalCode: client.postalCode ?? "",
                 country: client.country ?? "",
-                currency: client.currency ?? "",
                 notes: client.notes ?? "",
               }}
               onSubmit={onSubmit}
