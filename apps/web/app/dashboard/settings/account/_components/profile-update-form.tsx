@@ -83,7 +83,7 @@ export function ProfileUpdateForm() {
         updateUserResult.error?.message ?? "Failed to update profile"
       );
     } else if (emailResult.error) {
-      toast.error(emailResult.error?.message ?? "Failed to change email");
+      toast.error("Failed to change email");
     } else {
       if (data.email !== user?.email) {
         toast.success("Verify your new email address to complete the change.");
