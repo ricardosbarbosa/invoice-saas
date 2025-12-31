@@ -35,7 +35,7 @@ type InvoiceSettings = {
 
 const invoiceSettingsSchema = z.object({
   prefixTemplate: z.string().min(1, "Prefix template is required."),
-  numberPadding: z.coerce.number().int().min(1).max(10),
+  numberPadding: z.number().int().min(1).max(10),
   defaultCurrency: z
     .string()
     .length(3, "Use a 3-letter currency code.")
@@ -207,7 +207,7 @@ export default function Page() {
                         max={10}
                         disabled={isLoading}
                         aria-invalid={!!errors.numberPadding}
-                        {...register("numberPadding")}
+                        {...register("numberPadding", { valueAsNumber: true })}
                       />
                       <FieldError errors={[errors.numberPadding]} />
                       <FieldDescription>
