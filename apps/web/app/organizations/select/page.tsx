@@ -1,45 +1,59 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { authClient } from "@/lib/auth-client"
-import { Button } from "@workspace/ui/components/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@workspace/ui/components/field"
-import { Input } from "@workspace/ui/components/input"
-import { Separator } from "@workspace/ui/components/separator"
+import { Suspense, useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { Button } from "@workspace/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@workspace/ui/components/field";
+import { Input } from "@workspace/ui/components/input";
+import { Separator } from "@workspace/ui/components/separator";
 
 function slugify(value: string) {
   return value
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
+    .replace(/^-+|-+$/g, "");
 }
 
-export default function OrganizationSelectPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { useActiveOrganization, useListOrganizations, organization } = authClient
-  const { data: activeOrg } = useActiveOrganization()
-  const { data: organizations, isPending } = useListOrganizations()
-  const [name, setName] = useState("")
-  const [error, setError] = useState<string | null>(null)
-  const [isSubmitting, startTransition] = useTransition()
-  const allowExisting = searchParams.get("mode") === "manage"
+export function OrganizationSelect({ mode = "create" }: { mode?: string }) {
+  const router = useRouter();
+  const { useActiveOrganization, useListOrganizations, organization } =
+    authClient;
+  const { data: activeOrg } = useActiveOrganization();
+  const { data: organizations, isPending } = useListOrganizations();
+  const [name, setName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, startTransition] = useTransition();
+  const allowExisting = mode === "manage";
 
   useEffect(() => {
     if (activeOrg && !allowExisting) {
-      router.replace("/")
+      router.replace("/");
     }
-  }, [activeOrg, allowExisting, router])
+  }, [activeOrg, allowExisting, router]);
 
-  const hasOrganizations = useMemo(() => (organizations?.length ?? 0) > 0, [organizations])
+  const hasOrganizations = useMemo(
+    () => (organizations?.length ?? 0) > 0,
+    [organizations]
+  );
 
   const handleCreate = (event: React.FormEvent) => {
-    event.preventDefault()
-    if (!name) return
-    setError(null)
+    event.preventDefault();
+    if (!name) return;
+    setError(null);
 
     startTransition(async () => {
       await organization.create(
@@ -48,33 +62,35 @@ export default function OrganizationSelectPage() {
           onError: (ctx) => setError(ctx.error.message),
           onSuccess: async ({ data }) => {
             if (data?.id) {
-              await organization.setActive({ organizationId: data.id })
-              router.replace("/")
+              await organization.setActive({ organizationId: data.id });
+              router.replace("/");
             }
-          }
+          },
         }
-      )
-    })
-  }
+      );
+    });
+  };
 
   const handleSelect = (orgId: string) => {
-    setError(null)
+    setError(null);
     startTransition(async () => {
       await organization.setActive(
         { organizationId: orgId },
         {
           onError: (ctx) => setError(ctx.error.message),
-          onSuccess: () => router.replace("/")
+          onSuccess: () => router.replace("/"),
         }
-      )
-    })
-  }
+      );
+    });
+  };
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6 md:p-10">
       <div className="w-full max-w-2xl space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-neutral-900">Choose an organization</h1>
+          <h1 className="text-2xl font-semibold text-neutral-900">
+            Choose an organization
+          </h1>
           <p className="text-sm text-neutral-600">
             Select an existing organization or create a new one to continue.
           </p>
@@ -95,7 +111,9 @@ export default function OrganizationSelectPage() {
             )}
 
             {isPending ? (
-              <p className="text-sm text-neutral-600">Loading organizations...</p>
+              <p className="text-sm text-neutral-600">
+                Loading organizations...
+              </p>
             ) : hasOrganizations ? (
               <div className="space-y-3">
                 {organizations?.map((org) => (
@@ -105,16 +123,24 @@ export default function OrganizationSelectPage() {
                   >
                     <div>
                       <p className="font-medium text-neutral-900">{org.name}</p>
-                      <p className="text-xs text-neutral-500">{org.slug ?? org.id}</p>
+                      <p className="text-xs text-neutral-500">
+                        {org.slug ?? org.id}
+                      </p>
                     </div>
-                    <Button variant="secondary" onClick={() => handleSelect(org.id)} disabled={isSubmitting}>
+                    <Button
+                      variant="secondary"
+                      onClick={() => handleSelect(org.id)}
+                      disabled={isSubmitting}
+                    >
                       Use this organization
                     </Button>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-neutral-600">No organizations found. Create one below to continue.</p>
+              <p className="text-sm text-neutral-600">
+                No organizations found. Create one below to continue.
+              </p>
             )}
 
             <Separator />
@@ -122,7 +148,9 @@ export default function OrganizationSelectPage() {
             <form onSubmit={handleCreate} className="space-y-3">
               <FieldGroup>
                 <Field>
-                  <FieldLabel htmlFor="org-name">Create organization</FieldLabel>
+                  <FieldLabel htmlFor="org-name">
+                    Create organization
+                  </FieldLabel>
                   <Input
                     id="org-name"
                     value={name}
@@ -130,7 +158,9 @@ export default function OrganizationSelectPage() {
                     placeholder="Acme Inc."
                     required
                   />
-                  <FieldDescription>We will use the name to generate a slug automatically.</FieldDescription>
+                  <FieldDescription>
+                    We will use the name to generate a slug automatically.
+                  </FieldDescription>
                 </Field>
                 <Field>
                   <Button type="submit" disabled={isSubmitting || !name}>
@@ -143,5 +173,15 @@ export default function OrganizationSelectPage() {
         </Card>
       </div>
     </div>
-  )
+  );
+}
+
+export default function OrganizationSelectPage() {
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode") ?? "create";
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OrganizationSelect mode={mode} />
+    </Suspense>
+  );
 }
