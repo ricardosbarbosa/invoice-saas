@@ -1,3 +1,4 @@
+import { Prisma } from "@workspace/db";
 import { invoicesApi } from "./api";
 import type {
   InvoiceTotals,
