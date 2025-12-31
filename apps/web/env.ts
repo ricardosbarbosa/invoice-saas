@@ -1,13 +1,16 @@
-import { createEnv } from "@t3-oss/env-nextjs";
-import { urlSchema } from "@workspace/env";
+import z from "zod";
 
-export const env = createEnv({
-  server: {},
-  client: {
-    NEXT_PUBLIC_API_URL: urlSchema,
-  },
-  runtimeEnv: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-  },
-  emptyStringAsUndefined: true,
+// Helper to convert empty strings to undefined
+const emptyStringAsUndefined = (val: string | undefined) =>
+  val === "" ? undefined : val;
+
+const envSchema = z.object({
+  NEXT_PUBLIC_API_URL: z.string().url(),
 });
+
+// Parse and validate environment variables
+const rawEnv = {
+  NEXT_PUBLIC_API_URL: emptyStringAsUndefined(process.env.NEXT_PUBLIC_API_URL),
+};
+
+export const env = envSchema.parse(rawEnv);
