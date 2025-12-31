@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -84,7 +84,7 @@ const selectClassName =
 const textareaClassName =
   "border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 min-h-[96px] w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:ring-[3px]";
 
-const lightThemeStyle = {
+const lightThemeStyle: React.CSSProperties = {
   "--background": "oklch(1 0 0)",
   "--foreground": "oklch(0.145 0 0)",
   "--card": "oklch(1 0 0)",
@@ -104,7 +104,7 @@ const lightThemeStyle = {
   "--border": "oklch(0.922 0 0)",
   "--input": "oklch(0.922 0 0)",
   "--ring": "oklch(0.708 0 0)",
-} as CSSProperties;
+} as React.CSSProperties;
 
 const formatAddressLines = (client: Client) => {
   const lines: string[] = [];
