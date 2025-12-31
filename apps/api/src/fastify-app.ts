@@ -1,16 +1,18 @@
-import 'dotenv/config'
+import "dotenv/config";
 
-import { join } from 'node:path'
-import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload'
-import { FastifyPluginAsync, FastifyServerOptions } from 'fastify'
-import { env } from './env'
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import AutoLoad, { AutoloadPluginOptions } from "@fastify/autoload";
+import { FastifyPluginAsync, FastifyServerOptions } from "fastify";
+import { env } from "./env.js";
 
-export interface AppOptions extends FastifyServerOptions, Partial<AutoloadPluginOptions> {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-}
+export interface AppOptions
+  extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
 // Pass --options via CLI arguments in command to enable these options.
-const options: AppOptions = {
-}
+const options: AppOptions = {};
 
 const app: FastifyPluginAsync<AppOptions> = async (
   fastify,
@@ -18,7 +20,7 @@ const app: FastifyPluginAsync<AppOptions> = async (
 ): Promise<void> => {
   // Place here your custom code!
   // Validate environment variables as early as possible.
-  void env
+  void env;
 
   // Do not touch the following lines
 
@@ -26,17 +28,17 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // those should be support plugins that are reused
   // through your application
   void fastify.register(AutoLoad, {
-    dir: join(__dirname, 'plugins'),
-    options: opts
-  })
+    dir: join(__dirname, "plugins"),
+    options: opts,
+  });
 
   // This loads all plugins defined in routes
   // define your routes in one of these
   void fastify.register(AutoLoad, {
-    dir: join(__dirname, 'routes'),
-    options: opts
-  })
-}
+    dir: join(__dirname, "routes"),
+    options: opts,
+  });
+};
 
-export default app
-export { app, options }
+export default app;
+export { app, options };

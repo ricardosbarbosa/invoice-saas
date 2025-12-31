@@ -3,7 +3,7 @@ import { clientSchema, clientUpdateSchema } from "@workspace/types";
 import {
   getActiveOrganizationId,
   requireOrgPermission,
-} from "../lib/organization";
+} from "../lib/organization.js";
 import z from "zod";
 
 const paramsSchema = z.object({

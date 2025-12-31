@@ -1,7 +1,7 @@
 // This file contains code that we reuse between our tests.
 import * as test from "node:test";
 import Fastify from "fastify";
-import { app, options } from "../src/app";
+import { app, options } from "../src/fastify-app.js";
 
 process.env.DATABASE_URL ??=
   "postgres://postgres:postgres@localhost:5432/postgres";

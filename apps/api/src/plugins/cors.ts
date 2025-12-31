@@ -1,6 +1,6 @@
 import fp from "fastify-plugin";
 import cors, { FastifyCorsOptions } from "@fastify/cors";
-import { env } from "../env";
+import { env } from "../env.js";
 
 export default fp<FastifyCorsOptions>(async (fastify) => {
   await fastify.register(cors, {

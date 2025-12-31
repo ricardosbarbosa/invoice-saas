@@ -1,8 +1,8 @@
 import "dotenv/config";
 
 import Fastify from "fastify";
-import { app, options } from "./fastify-app";
-import { env } from "./env";
+import { app, options } from "./fastify-app.js";
+import { env } from "./env.js";
 
 async function start() {
   const fastify = Fastify({

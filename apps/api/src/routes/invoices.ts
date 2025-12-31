@@ -9,13 +9,13 @@ import {
 import {
   getActiveOrganizationId,
   requireOrgPermission,
-} from "../lib/organization";
-import { renderInvoicePdf } from "../lib/invoice-pdf";
+} from "../lib/organization.js";
+import { renderInvoicePdf } from "../lib/invoice-pdf.js";
 import {
   computeInvoiceTotals,
   parseDecimal,
   reserveInvoiceNumber,
-} from "../lib/invoice-utils";
+} from "../lib/invoice-utils.js";
 import z from "zod";
 
 const paramsSchema = z.object({

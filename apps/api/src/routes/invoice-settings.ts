@@ -1,7 +1,7 @@
 import type { FastifyPluginAsync } from "fastify"
 import { z } from "zod"
 
-import { getActiveOrganizationId, requireOrgPermission } from "../lib/organization"
+import { getActiveOrganizationId, requireOrgPermission } from "../lib/organization.js"
 
 const settingsSchema = z.object({
   prefixTemplate: z.string().min(1),
