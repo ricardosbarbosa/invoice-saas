@@ -4,7 +4,6 @@ import { admin, openAPI, organization } from "better-auth/plugins";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { ac, adminRoles, organizationRoles } from "./permissions.js";
 import { passkey } from "@better-auth/passkey";
-import { nextCookies } from "better-auth/next-js";
 
 const trustedOrigins: string[] = (process.env.CORS_ORIGIN ?? "")
   .split(",")
@@ -59,7 +58,6 @@ export const auth: ReturnType<typeof betterAuth> = betterAuth({
         enabled: true,
       },
     }),
-    nextCookies(),
   ],
 });
 
