@@ -4,6 +4,7 @@ import { admin, openAPI, organization } from "better-auth/plugins";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { ac, adminRoles, organizationRoles } from "./permissions.js";
 import { passkey } from "@better-auth/passkey";
+import { nextCookies } from "better-auth/next-js";
 
 const trustedOrigins: string[] = (process.env.CORS_ORIGIN ?? "")
   .split(",")
@@ -14,6 +15,12 @@ const trustedOrigins: string[] = (process.env.CORS_ORIGIN ?? "")
 // @ts-ignore
 export const auth: ReturnType<typeof betterAuth> = betterAuth({
   appName: "Invoice SaaS",
+  advanced: {
+    crossSubDomainCookies: { enabled: true },
+    defaultCookieAttributes: {
+      sameSite: "None",
+    },
+  },
   /**
    * Fastify base URL. Falls back to localhost when unset so
    * local dev works without extra configuration.
@@ -52,6 +59,7 @@ export const auth: ReturnType<typeof betterAuth> = betterAuth({
         enabled: true,
       },
     }),
+    nextCookies(),
   ],
 });
 
