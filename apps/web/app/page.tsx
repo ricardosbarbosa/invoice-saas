@@ -1,10 +1,11 @@
+"use client";
 import { redirect } from "next/navigation";
-import { getServerSession } from "../lib/server-session";
 import SignOutButton from "@/components/sign-out-button";
+import { authClient } from "@/lib/auth-client";
 
-export default async function DashboardPage() {
-  const session = await getServerSession();
-  console.log("session", session);
+export default function DashboardPage() {
+  const { data: session } = authClient.useSession();
+
   if (!session) {
     redirect("/login");
   } else {

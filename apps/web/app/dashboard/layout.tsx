@@ -1,18 +1,19 @@
+"use client";
 import { AppSidebar } from "@/components/app-sidebar";
-import { getServerSession } from "@/lib/server-session";
+import { authClient } from "@/lib/auth-client";
 import {
   SidebarInset,
   SidebarProvider,
 } from "@workspace/ui/components/sidebar";
 import { redirect } from "next/navigation";
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession();
-  console.log("session", session);
+  const { data: session } = authClient.useSession();
+
   if (!session) {
     redirect("/login");
   }
