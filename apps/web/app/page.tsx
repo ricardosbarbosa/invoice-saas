@@ -1,14 +1,14 @@
-import { redirect } from "next/navigation"
-import { getServerSession } from "../lib/server-session"
-import SignOutButton from "@/components/sign-out-button"
+import { redirect } from "next/navigation";
+import { getServerSession } from "../lib/server-session";
+import SignOutButton from "@/components/sign-out-button";
 
 export default async function DashboardPage() {
-  const session = await getServerSession()
-
+  const session = await getServerSession();
+  console.log("session", session);
   if (!session) {
-    redirect("/login")
+    redirect("/login");
   } else {
-    redirect("/dashboard")
+    redirect("/dashboard");
   }
 
   return (
@@ -17,7 +17,9 @@ export default async function DashboardPage() {
         <header className="flex items-center justify-between">
           <div>
             <p className="text-sm text-neutral-500">Protected area</p>
-            <h1 className="text-3xl font-semibold text-neutral-900">Dashboard</h1>
+            <h1 className="text-3xl font-semibold text-neutral-900">
+              Dashboard
+            </h1>
           </div>
           <div className="rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
             Signed in
@@ -27,11 +29,15 @@ export default async function DashboardPage() {
 
         <section className="rounded-xl border bg-white/70 p-6 shadow-sm backdrop-blur">
           <h2 className="text-lg font-semibold text-neutral-900">Session</h2>
-          <p className="text-sm text-neutral-600">Welcome back, {session?.user?.email ?? "user"}.</p>
+          <p className="text-sm text-neutral-600">
+            Welcome back, {session?.user?.email ?? "user"}.
+          </p>
           <dl className="mt-4 grid grid-cols-1 gap-4 text-sm text-neutral-700 sm:grid-cols-2">
             <div className="rounded-lg border border-neutral-100 bg-neutral-50/70 p-3">
               <dt className="font-semibold text-neutral-900">User ID</dt>
-              <dd className="mt-1 break-all text-neutral-700">{session?.user?.id}</dd>
+              <dd className="mt-1 break-all text-neutral-700">
+                {session?.user?.id}
+              </dd>
             </div>
             <div className="rounded-lg border border-neutral-100 bg-neutral-50/70 p-3">
               <dt className="font-semibold text-neutral-900">Email</dt>
@@ -39,10 +45,11 @@ export default async function DashboardPage() {
             </div>
           </dl>
           <p className="mt-4 text-xs text-neutral-500">
-            This page is rendered on the server and redirects if no valid Better Auth session cookie is present.
+            This page is rendered on the server and redirects if no valid Better
+            Auth session cookie is present.
           </p>
         </section>
       </div>
     </div>
-  )
+  );
 }

@@ -12,6 +12,7 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession();
+  console.log("session", session);
   if (!session) {
     redirect("/login");
   }
