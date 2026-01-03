@@ -28,12 +28,14 @@ export const invoiceItemSchema = z.object({
  * Base invoice schema (without clientId for updates).
  */
 export const invoiceBaseSchema = z.object({
-  clientId: z.string().min(1),
-  issueDate: z.string().datetime(),
-  dueDate: z.string().datetime(),
-  currency: z.string().length(3),
-  notes: z.string(),
-  items: z.array(invoiceItemSchema).min(1),
+  clientId: z.string().min(1, "Client is required."),
+  issueDate: z.date({ error: "Issue date is required." }),
+  dueDate: z.date({ error: "Due date is required." }),
+  currency: z.string().length(3, "Currency must be 3 characters.").optional(),
+  notes: z.string().optional(),
+  items: z
+    .array(invoiceItemSchema)
+    .min(1, { error: "Add at least one line item." }),
 });
 
 /**

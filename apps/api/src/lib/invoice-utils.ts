@@ -1,14 +1,13 @@
-import { Decimal } from "@workspace/db"
-import type { Prisma } from "@workspace/db"
-import type { DecimalLike } from "@workspace/types"
+import { Decimal } from "@workspace/db";
+import type { Prisma } from "@workspace/db";
 
 /**
  * Invoice item input type for calculations (uses Prisma Decimal).
  */
 export type InvoiceItemInput = {
-  quantity: Prisma.Decimal
-  unitPrice: Prisma.Decimal
-}
+  quantity: Prisma.Decimal;
+  unitPrice: Prisma.Decimal;
+};
 
 const ZERO_DECIMAL_CURRENCIES = new Set([
   "BIF",
@@ -27,7 +26,7 @@ const ZERO_DECIMAL_CURRENCIES = new Set([
   "XAF",
   "XOF",
   "XPF",
-])
+]);
 
 const THREE_DECIMAL_CURRENCIES = new Set([
   "BHD",
@@ -37,54 +36,55 @@ const THREE_DECIMAL_CURRENCIES = new Set([
   "LYD",
   "OMR",
   "TND",
-])
-
-const toDecimal = (value: DecimalLike) => new Decimal(value)
+]);
 
 export const formatInvoicePrefix = (template: string, date: Date) => {
-  const year = String(date.getFullYear())
-  const shortYear = year.slice(-2)
-  const month = String(date.getMonth() + 1).padStart(2, "0")
-  const day = String(date.getDate()).padStart(2, "0")
+  const year = String(date.getFullYear());
+  const shortYear = year.slice(-2);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
 
   return template
     .replace(/YYYY/g, year)
     .replace(/YY/g, shortYear)
     .replace(/MM/g, month)
-    .replace(/DD/g, day)
-}
+    .replace(/DD/g, day);
+};
 
 export const getCurrencyFractionDigits = (currency: string) => {
-  const upper = currency.toUpperCase()
-  if (ZERO_DECIMAL_CURRENCIES.has(upper)) return 0
-  if (THREE_DECIMAL_CURRENCIES.has(upper)) return 3
-  return 2
-}
+  const upper = currency.toUpperCase();
+  if (ZERO_DECIMAL_CURRENCIES.has(upper)) return 0;
+  if (THREE_DECIMAL_CURRENCIES.has(upper)) return 3;
+  return 2;
+};
 
 const roundToCurrency = (amount: Prisma.Decimal, currency: string) =>
-  amount.toDecimalPlaces(getCurrencyFractionDigits(currency), Decimal.ROUND_HALF_UP)
+  amount.toDecimalPlaces(
+    getCurrencyFractionDigits(currency),
+    Decimal.ROUND_HALF_UP
+  );
 
 export const computeInvoiceTotals = ({
   items,
   currency,
 }: {
-  items: InvoiceItemInput[]
-  currency: string
+  items: InvoiceItemInput[];
+  currency: string;
 }) => {
   const subtotal = items.reduce((sum, item) => {
-    return sum.plus(item.unitPrice.mul(item.quantity))
-  }, toDecimal(0))
+    return sum.plus(item.unitPrice.mul(item.quantity));
+  }, new Decimal(0));
 
-  const total = subtotal
+  const total = subtotal;
 
   return {
     subtotal: roundToCurrency(subtotal, currency).toString(),
     total: roundToCurrency(total, currency).toString(),
-  }
-}
+  };
+};
 
-export const parseDecimal = (value: DecimalLike | null | undefined) =>
-  value === null || value === undefined ? null : toDecimal(value)
+export const parseDecimal = (value: string | null | undefined) =>
+  value === null || value === undefined ? null : new Decimal(value);
 
 export const reserveInvoiceNumber = async (
   tx: Prisma.TransactionClient,
@@ -108,9 +108,9 @@ export const reserveInvoiceNumber = async (
       numberPadding: true,
       defaultCurrency: true,
     },
-  })
+  });
 
-  const prefix = formatInvoicePrefix(settings.prefixTemplate, issueDate)
+  const prefix = formatInvoicePrefix(settings.prefixTemplate, issueDate);
 
   if (settings.lastPrefix !== prefix) {
     await tx.invoiceSettings.updateMany({
@@ -122,20 +122,20 @@ export const reserveInvoiceNumber = async (
         lastPrefix: prefix,
         nextNumber: 1,
       },
-    })
+    });
   }
 
   const updated = await tx.invoiceSettings.update({
     where: { organizationId },
     data: { nextNumber: { increment: 1 } },
     select: { nextNumber: true, numberPadding: true },
-  })
+  });
 
-  const sequence = updated.nextNumber - 1
-  const padded = String(sequence).padStart(updated.numberPadding, "0")
+  const sequence = updated.nextNumber - 1;
+  const padded = String(sequence).padStart(updated.numberPadding, "0");
 
   return {
     number: `${prefix}${padded}`,
     defaultCurrency: settings.defaultCurrency,
-  }
-}
+  };
+};

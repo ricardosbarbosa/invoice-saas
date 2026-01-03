@@ -3,6 +3,15 @@ import Link from "next/link";
 import { InvoiceForm } from "@/components/invoice-form";
 import { Button } from "@workspace/ui/components/button";
 import PageHeader from "@/components/page-header";
+import { InvoiceFormV2 } from "@/components/invoice-form-v2";
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardTitle,
+  CardHeader,
+  CardContent,
+} from "@workspace/ui/components/card";
 
 type PageProps = {
   searchParams?: Promise<{ clientId?: string | string[] }>;
@@ -24,8 +33,8 @@ export default async function Page({ searchParams }: PageProps) {
           </Button>
         }
       />
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0 container mx-auto">
-        <InvoiceForm initialValues={{ clientId: clientId ?? "" }} />
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-4 container mx-auto">
+        <InvoiceFormV2 initialValues={{ clientId: clientId ?? "" }} />
       </div>
     </>
   );

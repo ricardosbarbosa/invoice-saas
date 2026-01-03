@@ -22,7 +22,7 @@ const paramsSchema = z.object({
   invoiceId: z.string().min(1),
 });
 
-const normalizeDate = (value?: string) =>
+const normalizeDate = (value?: Date | string) =>
   value ? new Date(value) : new Date();
 
 const sanitizeFilename = (value: string) => {
@@ -101,10 +101,7 @@ const invoices: FastifyPluginAsync = async (fastify) => {
           issueDate
         );
 
-        const currency = (
-          body.currency ||
-          defaultCurrency
-        ).toUpperCase();
+        const currency = (body.currency || defaultCurrency).toUpperCase();
 
         return tx.invoice.create({
           data: {

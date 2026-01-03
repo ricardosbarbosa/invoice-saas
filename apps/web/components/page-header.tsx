@@ -20,7 +20,7 @@ export default function PageHeader({
         />
         <h1 className="text-lg font-semibold">{title}</h1>
       </div>
-      <div className="ml-auto px-4">
+      <div className="ml-auto px-4 flex items-center gap-2">
         {actions}
         <ModeToggle enableSystem={false} />
       </div>
