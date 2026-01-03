@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { Prisma } from "@workspace/db";
-import { decimalInput } from "./common";
+import { numericString } from "./common";
 
 /**
  * Invoice totals calculation result.
@@ -20,8 +20,8 @@ export type InvoiceStatus = "draft" | "sent" | "paid" | "void";
  */
 export const invoiceItemSchema = z.object({
   description: z.string().min(1),
-  quantity: decimalInput,
-  unitPrice: decimalInput,
+  quantity: numericString,
+  unitPrice: numericString,
 });
 
 /**

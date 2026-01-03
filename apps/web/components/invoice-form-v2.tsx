@@ -95,11 +95,11 @@ export function InvoiceFormV2({ invoiceId, initialValues }: InvoiceFormProps) {
           description: item.description ?? "",
           quantity:
             item.quantity === null || item.quantity === undefined
-              ? 1
+              ? "1"
               : item.quantity,
-          unitPrice: item.unitPrice ?? 0,
+          unitPrice: item.unitPrice ?? "0",
         }))
-      : [{ description: "", quantity: 1, unitPrice: 0 }];
+      : [{ description: "", quantity: "1", unitPrice: "0" }];
 
   const {
     control,
@@ -153,7 +153,7 @@ export function InvoiceFormV2({ invoiceId, initialValues }: InvoiceFormProps) {
   };
 
   const subtotal = (watchedItems ?? []).reduce((sum, item) => {
-    return sum + item.quantity * item.unitPrice;
+    return sum + parseNumber(item.quantity) * parseNumber(item.unitPrice);
   }, 0);
 
   const total = subtotal;
@@ -332,8 +332,8 @@ export function InvoiceFormV2({ invoiceId, initialValues }: InvoiceFormProps) {
         <CardContent className="space-y-4">
           {fields.map((field, index) => {
             const lineSubtotal =
-              (watchedItems?.[index]?.quantity || 0) *
-              (watchedItems?.[index]?.unitPrice || 0);
+              parseNumber(watchedItems?.[index]?.quantity) *
+              parseNumber(watchedItems?.[index]?.unitPrice);
 
             return (
               <div key={field.id} className="flex space-x-4 ">
@@ -407,8 +407,8 @@ export function InvoiceFormV2({ invoiceId, initialValues }: InvoiceFormProps) {
             onClick={() =>
               append({
                 description: "",
-                quantity: 1,
-                unitPrice: 0,
+                quantity: "1",
+                unitPrice: "0",
               })
             }
           >
