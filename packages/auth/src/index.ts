@@ -47,14 +47,30 @@ const trustedOrigins: string[] = (process.env.CORS_ORIGIN ?? "")
   .map((origin: string) => origin.trim())
   .filter(Boolean);
 
+const isProd = process.env.NODE_ENV === "production";
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const auth: ReturnType<typeof betterAuth> = betterAuth({
   appName: "Invoice SaaS",
   advanced: {
-    crossSubDomainCookies: { enabled: true },
+    /**
+     * Important:
+     * - In production (HTTPS + real subdomains), cross-subdomain cookies are desirable.
+     * - On localhost, setting a cookie Domain can cause browsers to reject the cookie.
+     */
+    crossSubDomainCookies: { enabled: isProd },
     defaultCookieAttributes: {
-      sameSite: "None",
+      /**
+       * Important:
+       * - `SameSite=None` requires `Secure` in modern browsers.
+       * - Local dev often runs on plain HTTP, so `SameSite=Lax` + non-secure cookies
+       *   are more reliable on localhost.
+       */
+      sameSite: isProd ? "None" : "Lax",
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - depends on better-auth version typings
+      secure: isProd,
     },
   },
   /**
