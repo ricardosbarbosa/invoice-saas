@@ -4,6 +4,9 @@ import { admin, openAPI, organization } from "better-auth/plugins";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { ac, adminRoles, organizationRoles } from "./permissions.js";
 import { passkey } from "@better-auth/passkey";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const trustedOrigins: string[] = (process.env.CORS_ORIGIN ?? "")
   .split(",")
@@ -27,7 +30,39 @@ export const auth: ReturnType<typeof betterAuth> = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3001",
   secret: process.env.BETTER_AUTH_SECRET,
   database: prismaAdapter(prisma, { provider: "postgresql" }),
-  emailAndPassword: { enabled: true },
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await resend.emails.send({
+        from: "rbrico@gmail.com",
+        to: user.email,
+        subject: "Reset your password",
+        text: `Hello ${user.name}, click ${url} to reset your password.`,
+        html: `
+          <p>Hello ${user.name},</p>
+          <p>Click <a href="${url}">here</a> to reset your password.</p>
+        `,
+      });
+    },
+  },
+  emailVerification: {
+    autoSignInAfterVerification: true,
+    sendOnSignUp: true,
+    sendOnSignIn: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await resend.emails.send({
+        from: "rbrico@gmail.com",
+        to: user.email,
+        subject: "Verify your email",
+        text: `Hello ${user.name}, click ${url} to verify your email.`,
+        html: `
+          <p>Hello ${user.name},</p>
+          <p>Click <a href="${url}">here</a> to verify your email.</p>
+        `,
+      });
+    },
+  },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,

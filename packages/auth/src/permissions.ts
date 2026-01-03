@@ -1,15 +1,18 @@
-import { createAccessControl } from "better-auth/plugins/access"
+import {
+  createAccessControl,
+  type Statements,
+} from "better-auth/plugins/access";
 import {
   adminAc as adminPluginAdmin,
   defaultStatements as adminStatements,
   userAc as adminPluginUser,
-} from "better-auth/plugins/admin/access"
+} from "better-auth/plugins/admin/access";
 import {
   adminAc as orgAdmin,
   defaultStatements as orgStatements,
   memberAc,
   ownerAc,
-} from "better-auth/plugins/organization/access"
+} from "better-auth/plugins/organization/access";
 
 const statements = {
   ...adminStatements,
@@ -18,9 +21,12 @@ const statements = {
   invoice: ["create", "read", "update", "delete", "send", "mark-paid", "void"],
   invoiceItem: ["create", "read", "update", "delete"],
   invoiceSettings: ["read", "update"],
-} as const
+} as const;
 
-export const ac = createAccessControl(statements)
+// Widen the inferred type so `ac` is compatible with both server + client plugins.
+// Without this, `newRole` becomes too narrowly typed (specific statement keys only),
+// which fails assignment to the client-side `AccessControl` type due to variance.
+export const ac = createAccessControl(statements as unknown as Statements);
 
 export const adminRoles = {
   admin: ac.newRole({
@@ -29,20 +35,36 @@ export const adminRoles = {
   user: ac.newRole({
     ...adminPluginUser.statements,
   }),
-} as const
+} as const;
 
 export const organizationRoles = {
   owner: ac.newRole({
     ...ownerAc.statements,
     client: ["create", "read", "update", "delete", "archive"],
-    invoice: ["create", "read", "update", "delete", "send", "mark-paid", "void"],
+    invoice: [
+      "create",
+      "read",
+      "update",
+      "delete",
+      "send",
+      "mark-paid",
+      "void",
+    ],
     invoiceItem: ["create", "read", "update", "delete"],
     invoiceSettings: ["read", "update"],
   }),
   admin: ac.newRole({
     ...orgAdmin.statements,
     client: ["create", "read", "update", "delete", "archive"],
-    invoice: ["create", "read", "update", "delete", "send", "mark-paid", "void"],
+    invoice: [
+      "create",
+      "read",
+      "update",
+      "delete",
+      "send",
+      "mark-paid",
+      "void",
+    ],
     invoiceItem: ["create", "read", "update", "delete"],
     invoiceSettings: ["read", "update"],
   }),
@@ -53,4 +75,4 @@ export const organizationRoles = {
     invoiceItem: ["read"],
     invoiceSettings: ["read"],
   }),
-} as const
+} as const;
