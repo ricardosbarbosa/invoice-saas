@@ -93,8 +93,8 @@ export default function Page() {
                 items:
                   invoice?.items?.map((item) => ({
                     description: item.description,
-                    quantity: item.quantity?.toNumber?.() ?? 0,
-                    unitPrice: item.unitPrice?.toNumber?.() ?? 0,
+                    quantity: item.quantity?.toString?.() ?? "0",
+                    unitPrice: item.unitPrice?.toString?.() ?? "0",
                   })) ?? [],
               }}
             />
