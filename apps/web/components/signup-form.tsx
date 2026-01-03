@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Button } from "@workspace/ui/components/button"
+import { Button } from "@workspace/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card"
+} from "@workspace/ui/components/card";
 import {
   Field,
   FieldContent,
@@ -20,10 +20,10 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@workspace/ui/components/field"
-import { Input } from "@workspace/ui/components/input"
-import { toast } from "@workspace/ui/components/sonner"
-import { authClient } from "@/lib/auth-client"
+} from "@workspace/ui/components/field";
+import { Input } from "@workspace/ui/components/input";
+import { toast } from "@workspace/ui/components/sonner";
+import { authClient } from "@/lib/auth-client";
 
 const signupFormSchema = z
   .object({
@@ -35,12 +35,12 @@ const signupFormSchema = z
   .refine((values) => values.password === values.confirmPassword, {
     path: ["confirmPassword"],
     message: "Passwords do not match.",
-  })
+  });
 
-type SignupFormValues = z.infer<typeof signupFormSchema>
+type SignupFormValues = z.infer<typeof signupFormSchema>;
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const router = useRouter()
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -54,7 +54,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       password: "",
       confirmPassword: "",
     },
-  })
+  });
 
   const onSubmit = async (values: SignupFormValues) => {
     try {
@@ -62,24 +62,24 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         name: values.name,
         email: values.email,
         password: values.password,
-      })
+      });
 
       if (result?.error) {
-        const message = result.error.message ?? "Unable to create account."
-        setError("root", { message })
-        toast.error(message)
-        return
+        const message = result.error.message ?? "Unable to create account.";
+        setError("root", { message });
+        toast.error(message);
+        return;
       }
 
-      toast.success("Account created. Redirecting...")
-      router.push("/organizations/select")
-      router.refresh()
+      toast.success("Account created. Redirecting...");
+      router.push("/");
+      router.refresh();
     } catch {
-      const message = "Unable to create account. Please try again."
-      setError("root", { message })
-      toast.error(message)
+      const message = "Unable to create account. Please try again.";
+      setError("root", { message });
+      toast.error(message);
     }
-  }
+  };
 
   return (
     <Card {...props}>
@@ -117,8 +117,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 />
                 <FieldError errors={[errors.email]} />
                 <FieldDescription>
-                  We&apos;ll use this to contact you. We will not share your email
-                  with anyone else.
+                  We&apos;ll use this to contact you. We will not share your
+                  email with anyone else.
                 </FieldDescription>
               </FieldContent>
             </Field>
@@ -149,7 +149,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   {...register("confirmPassword")}
                 />
                 <FieldError errors={[errors.confirmPassword]} />
-                <FieldDescription>Please confirm your password.</FieldDescription>
+                <FieldDescription>
+                  Please confirm your password.
+                </FieldDescription>
               </FieldContent>
             </Field>
             <Field>
@@ -169,5 +171,5 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

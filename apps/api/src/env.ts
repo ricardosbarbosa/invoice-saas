@@ -16,6 +16,12 @@ const envSchema = z.object({
   BETTER_AUTH_URL: z.string().url().optional(),
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
+  // Used by @workspace/auth (Resend) for password reset + email verification.
+  RESEND_API_KEY: z.string().min(1),
+  // Must be a verified sender in Resend (usually a verified domain).
+  // Example: "Invoice SaaS <no-reply@yourdomain.com>"
+  // For quick local testing you can use: "Invoice SaaS <onboarding@resend.dev>"
+  RESEND_FROM: z.string().min(1).optional(),
 });
 
 // Parse and validate environment variables

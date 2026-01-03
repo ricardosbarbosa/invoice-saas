@@ -19,6 +19,7 @@ import { useState, useTransition } from "react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@workspace/ui/components/sonner";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function LoginForm({
   className,
@@ -74,15 +75,6 @@ export function LoginForm({
                 />
               </Field>
               <Field>
-                <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
                 <Input
                   id="password"
                   type="password"
@@ -90,6 +82,15 @@ export function LoginForm({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <div className="flex items-center">
+                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <Link
+                    href={`/request-reset-password`}
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
               </Field>
               <Field>
                 <Button type="submit" disabled={isPendingAction}>
