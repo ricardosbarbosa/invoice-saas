@@ -187,6 +187,46 @@ export const auth: ReturnType<typeof betterAuth> = betterAuth({
       dynamicAccessControl: {
         enabled: true,
       },
+      sendInvitationEmail: async ({
+        email,
+        organization,
+        inviter,
+        invitation,
+        role,
+      }) => {
+        const from = getResendFrom();
+        if (!from) {
+          throw new Error(
+            'RESEND_FROM is not set. Set it to something like "Invoice SaaS <no-reply@yourdomain.com>" (must be a verified sender in Resend).'
+          );
+        }
+
+        const frontendBaseURL = getFrontendBaseURL(trustedOrigins);
+        const invitationUrl = new URL(
+          `/organizations/invitations`,
+          frontendBaseURL
+        );
+
+        const resend = getResendClient();
+        const result = await resend.emails.send({
+          from,
+          to: email,
+          subject: `Invitation to join the ${organization.name} organization`,
+          text: `Hello ${inviter.user.name}, you have been invited to join the ${organization.name} organization as ${role ?? "member"}. Click ${invitationUrl.toString()} to accept the invitation.`,
+          html: `
+            <p>Hello ${inviter.user.name},</p>
+            <p>You have been invited to join the ${organization.name} organization as ${role ?? "member"}. Click <a href="${invitationUrl.toString()}">here</a> to accept the invitation.</p>
+          `,
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const maybeError = (result as any)?.error;
+        if (maybeError) {
+          throw new Error(
+            `Failed to send invitation email via Resend: ${maybeError?.message ?? String(maybeError)}`
+          );
+        }
+      },
     }),
   ],
 });

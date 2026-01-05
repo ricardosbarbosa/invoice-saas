@@ -32,7 +32,7 @@ export default function AccountClient() {
           value={tab}
           onValueChange={setTab}
         >
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profile">
               <User />
               <span className="max-sm:hidden">Profile</span>
