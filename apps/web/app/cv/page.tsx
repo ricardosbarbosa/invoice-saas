@@ -45,16 +45,17 @@ export default function CVPage() {
               </li>
             </ul>
             <p>
-              Software engineer with a front-end focus, combining{" "}
-              <strong>performance</strong>, <strong>quality</strong>, and{" "}
-              <strong>user experience</strong> to ship reliable products at
+              Full stack software engineer with a strong front-end foundation,
+              combining <strong>performance</strong>, <strong>quality</strong>,
+              and <strong>user experience</strong> to ship reliable products at
               scale. I have a track record of{" "}
-              <strong>technical leadership</strong> in React/Next.js—raising
-              component standards, strengthening TypeScript across critical user
-              flows, and improving confidence through testing (e.g. Playwright).
-              I enjoy partnering closely with product and design to turn complex
-              requirements into interfaces that are simple, fast, and easy to
-              maintain.
+              <strong>technical leadership</strong> in React/Next.js,
+              TypeScript, Node.js, and API development—raising component
+              standards, strengthening critical user flows, and improving
+              confidence through unit and end-to-end testing. I enjoy partnering
+              closely with product, design, and engineering teams to turn
+              complex requirements into systems that are simple, fast, and easy
+              to maintain.
             </p>
           </header>
 
@@ -62,6 +63,43 @@ export default function CVPage() {
 
           <section>
             <h2>Professional Experience</h2>
+
+            <h3>
+              Full Stack Engineer — Warner Music Group · Contract (Jan 2025 -
+              Jun 2026)
+            </h3>
+            <ul>
+              <li>
+                Built and maintained full-stack product features across a React
+                front end and Node.js services powered by Fastify, contributing
+                to user-facing workflows while keeping the implementation
+                aligned with existing architecture, performance expectations,
+                and release standards.
+              </li>
+              <li>
+                Worked in a quality-focused codebase with a minimum 80% unit
+                test coverage target, writing and maintaining tests around core
+                business logic, API behavior, and UI interactions to keep
+                regressions visible before production.
+              </li>
+              <li>
+                Strengthened end-to-end confidence with Playwright by validating
+                critical user journeys across the application, improving
+                reliability for releases and making complex cross-layer changes
+                easier for the team to review and ship.
+              </li>
+              <li>
+                Collaborated with front-end, back-end, QA, and product partners
+                to debug issues, refine technical requirements, and deliver
+                maintainable features in a contract environment with a strong
+                emphasis on clear handoffs and sustainable engineering
+                practices.
+              </li>
+            </ul>
+            <p>
+              <strong>Tech</strong>: React, TypeScript, Node.js, Fastify,
+              Playwright, Unit Testing
+            </p>
 
             <h3>
               Senior Front-end Developer — Bilt Technologies Inc (2024 - 2025)
@@ -279,16 +317,21 @@ export default function CVPage() {
             <h2>Skills</h2>
 
             <h3>Languages</h3>
-            <p>JavaScript, TypeScript, CSS, HTML, SQL, Python, GraphQL</p>
+            <p>
+              JavaScript, TypeScript, Node.js, CSS, HTML, SQL, Python, GraphQL
+            </p>
 
             <h3>Frameworks</h3>
             <p>
-              React, Next.js, Redux, Tailwind CSS, Django, Flask, Material UI,
-              Express.js, Ant Design
+              React, Next.js, Fastify, Redux, Tailwind CSS, Django, Flask,
+              Material UI, Express.js, Ant Design
             </p>
 
             <h3>Tools</h3>
-            <p>Git, GitHub, Prisma, Auth0, Firebase, Jira, Figma, Playwright</p>
+            <p>
+              Git, GitHub, Prisma, Auth0, Firebase, Jira, Figma, Playwright,
+              Unit Testing, End-to-End Testing
+            </p>
 
             <h3>Experience Years</h3>
             <ul>
@@ -296,13 +339,22 @@ export default function CVPage() {
                 <strong>Front-end Development</strong>: 10 years
               </li>
               <li>
-                <strong>React</strong>: 7 years
+                <strong>React</strong>: 8 years
               </li>
               <li>
                 <strong>Next.js</strong>: 4 years
               </li>
               <li>
+                <strong>TypeScript</strong>: 5 years
+              </li>
+              <li>
                 <strong>FastAPI</strong>: 3 years
+              </li>
+              <li>
+                <strong>Node.js</strong>: 3 years
+              </li>
+              <li>
+                <strong>Playwright</strong>: 3 years
               </li>
               <li>
                 <strong>Django</strong>: 3 years
@@ -311,7 +363,7 @@ export default function CVPage() {
                 <strong>Python</strong>: 3 years
               </li>
               <li>
-                <strong>Node.js</strong>: 2 years
+                <strong>Fastify</strong>: 2 years
               </li>
               <li>
                 <strong>Tailwind CSS</strong>: 2 years
